@@ -65,12 +65,4 @@ void loop()
 }
 ```
 
-## Mastery Questions
 
-### Mastery Question 1
-
-Wire up your circuit as follows: 
-
-![](2022-02-27-13-28-22.png)
-
-Create a circuit where you can flash from left to right. Repeating forever. 0 -> 1 -> 2 | 0 -> 1 -> 2

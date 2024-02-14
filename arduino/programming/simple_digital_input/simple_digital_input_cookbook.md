@@ -99,8 +99,4 @@ void loop() {
 * What do you think would happen if you try and pull more than 40 mA from a pin? 
 * What is the difference between INPUT and OUTPUT in pinMode()?
 
-## Mastery Questions 
 
-### Mastery 1: Dual Blinking Lights 
-
-Follow the creative challenge in the video. 
