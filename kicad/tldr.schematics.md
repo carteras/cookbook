@@ -1,39 +1,71 @@
 # Design a basic schematic
 
+## Simple Schematics
+
+Open KiCad. It's either pinned to your dash or you need to press `alt` and start typing `kicad`
+
 ![](assets/2024-03-11-11-55-51.png)
+
+Make a new project: 
 
 ![](assets/2024-03-11-11-56-25.png)
 
+Press `file` then `new project` then give it a name
+
 ![](assets/2024-03-11-11-56-42.png)
+
+Go back to load menu and press `schematic editor`
 
 ![](assets/2024-03-11-11-57-22.png)
 
+Welcome to the schematic editor
+
 ![](assets/2024-03-11-11-57-42.png)
+
+The top row has a list of menu items.
 
 ![](assets/2024-03-11-11-57-53.png)
 
+
+Directly below that is a shortcut to common tools. 
+
 ![](assets/2024-03-11-11-58-03.png)
+
+
+The left of the desktop are page settings. 
 
 ![](assets/2024-03-11-11-58-11.png)
 
+On the right of the desktop are schematic tools. 
+
 ![](assets/2024-03-11-11-58-22.png)
+
+To the far left we have a layered look at what is on our schematics. 
 
 ![](assets/2024-03-11-11-58-31.png)
 
+The desktop is where we do most of our work. 
+
 ![](assets/2024-03-11-11-58-41.png)
+
+To start click `Add A symbol`
 
 ![](assets/2024-03-11-11-58-53.png)
 
-You'll have to make your own library. 
+You'll have to make your own library. After that, search for `SW_SPST` - Single Pole Single Throw Switch. It doesn't matter that we are going to use momentary buttons because we can define that in our footprint. 
 
 ![](assets/2024-03-11-12-00-27.png)
 
+Drop it on the board somehwere. 
+
 ![](assets/2024-03-11-12-00-13.png)
+
+Do the same for `LED` `R`esistors and `Battery`
 
 ![](assets/2024-03-11-12-01-34.png)
 
 
-Hover over an end point and press `w` 
+To wire the different connectors, hover over an end point and press `w` 
 
 ![](assets/2024-03-11-12-02-37.png)
 
@@ -58,87 +90,27 @@ KiCAD 7 (normally) annotates the schematic automatically. If yours has lots of ?
 
 ![](assets/2024-03-11-12-07-13.png)
 
+Let's define our power supply. 
+
+Click on the power symbol
+
 ![](assets/2024-03-11-12-08-11.png)
+
+
+Click somewhere on the desktop 
 
 ![](assets/2024-03-11-12-08-25.png)
 
+Search for +5v
+
 ![](assets/2024-03-11-12-08-39.png)
+
+Drop it on the desktop on the `+` side of the power. 
 
 ![](assets/2024-03-11-12-09-18.png)
 
+Let's do the same for ground. 
+
 ![](assets/2024-03-11-12-09-49.png)
 
-![](assets/2024-03-11-12-15-37.png)
 
-![](assets/2024-03-11-12-16-42.png)
-
-![](assets/2024-03-11-12-16-52.png)
-
-![](assets/2024-03-11-12-16-58.png)
-
-![](assets/2024-03-11-12-18-00.png)
-
-![](assets/2024-03-11-12-18-29.png)
-
-![](assets/2024-03-11-12-18-50.png)
-
-![](assets/2024-03-11-12-19-29.png)
-
-![](assets/2024-03-11-12-20-18.png)
-
-![](assets/2024-03-11-12-22-30.png)
-
-![](assets/2024-03-11-12-22-47.png)
-
-![](assets/2024-03-11-12-24-36.png)
-
-
-![](assets/2024-03-11-12-26-17.png)
-
-![](assets/2024-03-11-12-28-42.png)
-
-![](assets/2024-03-11-12-30-16.png)
-
-![](assets/2024-03-11-12-34-01.png)
-
-![](assets/2024-03-11-12-34-10.png)
-
-
-![](assets/2024-03-11-12-34-22.png)
-
-![](assets/2024-03-11-12-36-38.png)
-
-![](assets/2024-03-11-12-34-55.png)
-
-
-![](assets/2024-03-11-12-43-08.png)
-
-
-![](assets/2024-03-11-12-43-44.png)
-
-![](assets/2024-03-11-12-43-24.png)
-
-![](assets/2024-03-11-12-44-01.png)
-
-![](assets/2024-03-11-12-44-20.png)
-
-![](assets/2024-03-11-12-44-31.png)
-
-![](assets/2024-03-11-12-54-01.png)
-
-![](assets/2024-03-11-12-58-05.png)
-
-![](assets/2024-03-11-13-00-32.png)
-
-![](assets/2024-03-11-13-00-44.png)
-
-
-Press alt+3 :)
-
-![](assets/2024-03-11-13-08-35.png)
-
-Hey, we got an error, go back to PCB mode and click 
-
-![](assets/2024-03-11-13-09-12.png)
-
-![](assets/2024-03-11-13-09-28.png)
