@@ -107,7 +107,7 @@ reverse_dict = {}
 for password in passwords:
     # Split the key-value pair by the colon to separate the password and hash
     password, hash = password.split(":")
-    # Store the password as the value and the hash as the key in the reverse dictionary
+    # Store the password as the value and the h###ash as the key in the reverse dictionary
     reverse_dict[hash] = password
 
 # The hash for which we want to find the corresponding password
@@ -134,3 +134,6 @@ print(inverted_dict)
 
 ```
 
+### Frequency counter
+
+Write a script to count the frequency of words in the string "hello world hello" and store the frequencies in a dictionary. Words are separated by spaces. Print the dictionary which should show each word as a key and its frequency as the value.
