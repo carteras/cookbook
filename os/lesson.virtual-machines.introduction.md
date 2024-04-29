@@ -26,8 +26,12 @@ This lesson will teach you the core skills of installing a virtual machine onto 
 * `nano` a basic text editor in the command line.
 * `vim` a superior text editor in the command line
 * `apt` aptitude is a package manager for Linux that allows us to easily customize our server for our needs. 
+* `chsh` change shell
+* `chsh -s`  set a specific login shell for the current user
 
 ## Instructions
+
+### Configuring virt-manager
 
 ```bash
 virt-manager
@@ -83,12 +87,11 @@ I know my image says NAT but we probably need `bridge`
 ![alt text](imgs/image-8.png)
 
 
+### Installing Ubuntu
 
 It's time to try or install Ubuntu 
 
 ![alt text](imgs/image-9.png)
-
-
 
 
 Keep default 
@@ -152,17 +155,21 @@ Reboot!
 
 If the reboot fails, kill the session and restart it manually. 
 
-![](assets/2024-04-29-16-06-19.png)
+### Configuring Linux
 
 Log on with the credentials you provided
 
+![](assets/2024-04-29-16-06-19.png)
 
+
+
+I have a feeling that we're in `shell` not `bash`
 
 ```bash
 adam@monty:$
 ```
 
-That dollar sign means our terminal session is shell. This means we are probably in shell (which is meh). Let's make sure we are not in bash
+Often that dollar sign means our terminal session is shell. This means we are probably in shell (which is meh). Let's make sure we are not in bash
 
 ```bash
 which bash
@@ -173,7 +180,7 @@ I got nothing
 Let's change our terminal to bash (this gives his command history)
 
 ```bash
-sudo chsh -s /bin/bash username
+sudo chsh -s /bin/bash [username]
 ```
 
 NOTE: You will probably be prompted to give your password because `sudo` means super user do
@@ -190,7 +197,7 @@ Let's make bash the default for new users
 sudo nano /etc/default/useradd
 ```
 
-(If this doesn't work, `sudo apt install nano`)
+(If this doesn't work, `sudo apt install nano` I'll explain it later)
 
 Find the line that starts with `SHELL=` and change it to:
 
@@ -368,3 +375,8 @@ root
 adam@monty:~$
 ```
 
+Okay, we are done for this session. If it's almost the end of the class can you shut this down? 
+
+```bash
+sudo shutdown now
+```
