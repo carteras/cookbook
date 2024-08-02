@@ -1,0 +1,22 @@
+name: adam_solo_linux_machine
+topology:
+  nodes:
+    test_server:
+      kind: linux
+      image: fedora:latest   
+      # privileged: true
+      mgmt-ipv4: 10.13.50.50
+      # binds:
+      #   - /sys/fs/cgroup:/sys/fs/cgroup:ro
+      # env:
+      #   - container=docker
+      cmd: "/usr/sbin/init"
+      publish:
+        - "22:22/tcp"
+      # publish:
+      #   - tcp/22 
+
+mgmt: 
+  network: mgmt-network
+  bridge: mgmt-bridge
+  ipv4-subnet: "10.13.50.0/24"
