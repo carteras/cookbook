@@ -126,4 +126,12 @@ venv.bak/
 dmypy.json
 
 # Pyre type checker
-.pyre/
+.pyre
+
+
+*/clab*/*
+*.key
+*.pem
+ansible-inventory.yml
+topology-data.json
+authorized_keys
