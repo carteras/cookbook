@@ -1,8 +1,0 @@
-name: solo_linux_machine
-topology:
-  nodes:
-    alpine:
-      kind: linux
-      image: reverse-ctf-server
-      ports:
-        - "2222:22/tcp"
