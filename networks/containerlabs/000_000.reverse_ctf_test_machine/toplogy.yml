@@ -1,8 +1,0 @@
-name: reverse_ctf_tester
-topology:
-  nodes:
-    alpine:
-      kind: linux
-      image: reverse-ctf-server
-      ports:
-        - "2222:22/tcp"
