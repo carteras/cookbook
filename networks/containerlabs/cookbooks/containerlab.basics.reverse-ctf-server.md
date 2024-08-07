@@ -8,9 +8,13 @@ To allow for testing of your network, you must deploy a test machine on your net
 name: reverse_ctf_tester
 topology:
   nodes:
-    alpine:
+    test:
       kind: linux
       image: reverse-ctf-server
       ports:
         - "2222:22/tcp"
 ```
+
+## Configuration 
+
+Should be done. Hop on bushranger/kellygang and test. 
