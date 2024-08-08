@@ -25,8 +25,8 @@ topology:
       ports:
         - "2222:22/tcp"
   links: 
-    - ['r1:eth1', 'test:eth1']
-    - ['r1:eth2', 'alpine_workstation:eth1']
+    - endpoints: ['r1:eth1', 'test:eth1']
+    - endpoints: ['r1:eth2', 'alpine_workstation:eth1']
 ```
 
 ## Configuration

@@ -19,7 +19,8 @@ topology:
       image: reverse-ctf-server
       ports:
         - "2222:22/tcp"
-  links: ['r1:eth1', 'test:eth1']
+  links: 
+    - endpoints: ['r1:eth1', 'test:eth1']
 ```
 
 
