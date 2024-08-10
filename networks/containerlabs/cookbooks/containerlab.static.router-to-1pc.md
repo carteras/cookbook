@@ -1,6 +1,6 @@
 # Set router with single static network
 
-
+![alt text](image.png)
 
 
 
@@ -30,3 +30,183 @@ topology:
 ```
 
 ## Configuration
+
+```bash
+sudo docker exec -it clab-test-router-static-r1 vtysh
+```
+
+
+
+```sh
+r1# configure terminal
+r1(config)# interface eth
+eth0  eth1  eth2  
+r1(config)# interface eth1 
+r1(config-if)# ip address 10.0.0.1/24
+r1(config-if)# interface eth2
+r1(config-if)# ip address 10.0.1.1/24
+r1(config-if)# end
+r1# show interface brief
+Interface       Status  VRF             Addresses
+---------       ------  ---             ---------
+eth0            up      default         172.20.20.3/24
+                                        + 2001:172:20:20::3/64
+eth1            up      default         10.0.0.1/24
+eth2            up      default         10.0.1.1/24
+lo              up      default 
+```
+
+```sh
+r1# show ip route
+Codes: K - kernel route, C - connected, S - static, R - RIP,
+       O - OSPF, I - IS-IS, B - BGP, E - EIGRP, N - NHRP,
+       T - Table, v - VNC, V - VNC-Direct, A - Babel, F - PBR,
+       f - OpenFabric,
+       > - selected route, * - FIB route, q - queued, r - rejected, b - backup
+       t - trapped, o - offload failure
+
+K>* 0.0.0.0/0 [0/0] via 172.20.20.1, eth0, 00:02:35
+C>* 10.0.0.0/24 is directly connected, eth1, 00:01:12
+C>* 10.0.1.0/24 is directly connected, eth2, 00:00:52
+C>* 172.20.20.0/24 is directly connected, eth0, 00:02:35
+```
+
+```bash
+sudo containerlab inspect -a
++---+--------------+--------------------+--------------------------------------+--------------+----------------------+-------+---------+----------------+----------------------+
+| # |  Topo Path   |      Lab Name      |                 Name                 | Container ID |        Image         | Kind  |  State  |  IPv4 Address  |     IPv6 Address     |
++---+--------------+--------------------+--------------------------------------+--------------+----------------------+-------+---------+----------------+----------------------+
+| 1 | topology.yml | test-router-static | clab-test-router-static-r1           | 3f477de258f5 | frrouting/frr:latest | linux | running | 172.20.20.3/24 | 2001:172:20:20::3/64 |
+| 2 |              |                    | clab-test-router-static-test         | 77235941d099 | reverse-ctf-server   | linux | running | 172.20.20.2/24 | 2001:172:20:20::2/64 |
+| 3 |              |                    | clab-test-router-static-workstation1 | 89f0c8f926ee | alpine:latest        | linux | running | 172.20.20.4/24 | 2001:172:20:20::4/64 |
++---+--------------+--------------------+--------------------------------------+--------------+----------------------+-------+---------+----------------+----------------------+
+
+
+```
+
+```bash
+sudo docker exec -it clab-test-router-static-test sh
+```
+
+```bash
+apk update
+apk add iproute2
+
+ip addr add 10.0.0.50/24 dev eth1 
+ip link set eth1 up
+```
+
+```sh
+ip route show
+default via 172.20.20.1 dev eth0 
+10.0.0.0/24 dev eth1 proto kernel scope link src 10.0.0.50 
+172.20.20.0/24 dev eth0 proto kernel scope link src 172.20.20.2 
+```
+
+Let's remove that default route and change it so we have two default routes with different weightings 
+
+```sh
+ip route del default via 172.20.20.1 dev eth0
+ip route add default via 10.0.0.1 dev eth1 metric 100
+route add default via 172.20.20.1 dev eth0 metric 200
+
+
+ip route show
+default via 10.0.0.1 dev eth1 metric 100 
+default via 172.20.20.1 dev eth0 metric 200 
+10.0.0.0/24 dev eth1 proto kernel scope link src 10.0.0.50 
+172.20.20.0/24 dev eth0 proto kernel scope link src 172.20.20.2 
+```
+
+```bash
+ping -c 4 10.0.0.1
+PING 10.0.0.1 (10.0.0.1): 56 data bytes
+64 bytes from 10.0.0.1: seq=0 ttl=64 time=0.046 ms
+64 bytes from 10.0.0.1: seq=1 ttl=64 time=0.093 ms
+64 bytes from 10.0.0.1: seq=2 ttl=64 time=0.095 ms
+64 bytes from 10.0.0.1: seq=3 ttl=64 time=0.101 ms
+
+--- 10.0.0.1 ping statistics ---
+4 packets transmitted, 4 packets received, 0% packet loss
+round-trip min/avg/max = 0.046/0.083/0.101 ms
+
+
+
+ping -c 4 10.0.1.1
+PING 10.0.1.1 (10.0.1.1): 56 data bytes
+64 bytes from 10.0.1.1: seq=0 ttl=64 time=0.037 ms
+64 bytes from 10.0.1.1: seq=1 ttl=64 time=0.039 ms
+64 bytes from 10.0.1.1: seq=2 ttl=64 time=0.102 ms
+64 bytes from 10.0.1.1: seq=3 ttl=64 time=0.099 ms
+
+--- 10.0.1.1 ping statistics ---
+4 packets transmitted, 4 packets received, 0% packet loss
+round-trip min/avg/max = 0.037/0.069/0.102 ms
+```
+
+Looking good
+
+
+```bash
+sudo containerlab inspect -a
+
++---+--------------+--------------------+--------------------------------------+--------------+----------------------+-------+---------+----------------+----------------------+
+| # |  Topo Path   |      Lab Name      |                 Name                 | Container ID |        Image         | Kind  |  State  |  IPv4 Address  |     IPv6 Address     |
++---+--------------+--------------------+--------------------------------------+--------------+----------------------+-------+---------+----------------+----------------------+
+| 1 | topology.yml | test-router-static | clab-test-router-static-r1           | 3f477de258f5 | frrouting/frr:latest | linux | running | 172.20.20.3/24 | 2001:172:20:20::3/64 |
+| 2 |              |                    | clab-test-router-static-test         | 77235941d099 | reverse-ctf-server   | linux | running | 172.20.20.2/24 | 2001:172:20:20::2/64 |
+| 3 |              |                    | clab-test-router-static-workstation1 | 89f0c8f926ee | alpine:latest        | linux | running | 172.20.20.4/24 | 2001:172:20:20::4/64 |
++---+--------------+--------------------+--------------------------------------+--------------+----------------------+-------+---------+----------------+----------------------+
+
+```
+
+```sh
+apk update
+apk add iproute2
+
+ip addr add 10.0.1.50/24 dev eth1 
+ip link set eth1 up
+
+
+ip route del default via  172.20.20.1 dev eth0
+ip route add default via 10.0.1.1 dev eth1 metric 100
+ip route add default via 172.20.20.1 dev eth0 metric 200
+
+
+ping -c 4 10.0.1.1
+PING 10.0.1.1 (10.0.1.1): 56 data bytes
+64 bytes from 10.0.1.1: seq=0 ttl=64 time=0.043 ms
+64 bytes from 10.0.1.1: seq=1 ttl=64 time=0.103 ms
+64 bytes from 10.0.1.1: seq=2 ttl=64 time=0.036 ms
+64 bytes from 10.0.1.1: seq=3 ttl=64 time=0.105 ms
+
+--- 10.0.1.1 ping statistics ---
+4 packets transmitted, 4 packets received, 0% packet loss
+round-trip min/avg/max = 0.036/0.071/0.105 ms
+
+
+ping -c 4 10.0.0.1
+PING 10.0.0.1 (10.0.0.1): 56 data bytes
+64 bytes from 10.0.0.1: seq=0 ttl=64 time=0.041 ms
+64 bytes from 10.0.0.1: seq=1 ttl=64 time=0.162 ms
+64 bytes from 10.0.0.1: seq=2 ttl=64 time=0.349 ms
+64 bytes from 10.0.0.1: seq=3 ttl=64 time=0.347 ms
+
+--- 10.0.0.1 ping statistics ---
+4 packets transmitted, 4 packets received, 0% packet loss
+round-trip min/avg/max = 0.041/0.224/0.349 ms
+
+
+
+ping -c 4 10.0.0.50
+PING 10.0.0.50 (10.0.0.50): 56 data bytes
+64 bytes from 10.0.0.50: seq=0 ttl=63 time=0.043 ms
+64 bytes from 10.0.0.50: seq=1 ttl=63 time=0.110 ms
+64 bytes from 10.0.0.50: seq=2 ttl=63 time=0.121 ms
+64 bytes from 10.0.0.50: seq=3 ttl=63 time=0.126 ms
+
+--- 10.0.0.50 ping statistics ---
+4 packets transmitted, 4 packets received, 0% packet loss
+round-trip min/avg/max = 0.043/0.100/0.126 ms
+```
+
