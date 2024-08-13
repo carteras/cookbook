@@ -172,7 +172,7 @@ Let's remove that default route and change it so we have two default routes with
 ```sh
 ip route del default via 172.20.20.1 dev eth0
 ip route add default via 10.0.0.1 dev eth1 metric 100
-route add default via 172.20.20.1 dev eth0 metric 200
+ip route add default via 172.20.20.1 dev eth0 metric 200
 
 
 ip route show
