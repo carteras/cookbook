@@ -140,3 +140,4 @@ languages/arduino/programming/node_modules/*
 \languages\arduino\programming\node_modules\*
 languages\arduino\programming\node_modules\*
 /languages/arduino/programming/export
+*.bak
