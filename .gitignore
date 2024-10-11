@@ -135,3 +135,8 @@ dmypy.json
 ansible-inventory.yml
 topology-data.json
 authorized_keys
+/languages/arduino/programming/node_modules/*
+languages/arduino/programming/node_modules/*
+\languages\arduino\programming\node_modules\*
+languages\arduino\programming\node_modules\*
+/languages/arduino/programming/export
