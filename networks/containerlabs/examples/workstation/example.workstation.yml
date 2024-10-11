@@ -1,0 +1,19 @@
+name: example.workstation
+topology:
+  nodes:
+    workstation1:
+      kind: linux
+      image: alpine:latest
+      labels:
+        graph-icon: host
+        graph-layer: 1
+
+    workstation2:
+      kind: linux
+      image: alpine:latest
+      labels:
+        graph-icon: host
+        graph-layer: 2
+
+  links: 
+    - endpoints: ['workstation1:eth1', "workstation2:eth1"]
