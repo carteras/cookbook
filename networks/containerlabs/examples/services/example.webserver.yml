@@ -1,0 +1,46 @@
+name: example.services.webserver
+topology: 
+  nodes:
+    workstation:
+      kind: linux
+      image: alpine
+      exec:
+        - apk update
+        - apk add iproute2 bash curl wget
+        - ip addr add 10.0.0.1/24 dev eth1
+        - ip link set eth1 up
+
+    webserver:
+      kind: linux
+      image: alpine
+      exec:
+        - apk update
+        - apk add iproute2 bash nginx
+        - ip addr add 10.0.0.2/24 dev eth1
+        - ip link set eth1 up
+        - sh /config/configure.nginx.sh
+      binds:
+        - ./config/webserver:/config
+
+
+    openvswitch:
+      kind: linux 
+      image: alpine
+      exec: 
+        - apk update
+        - apk add bash openvswitch
+        - mkdir -p /var/run/openvswitch  # Ensure the directory for OVS sockets and PID exists
+        - mkdir -p /etc/openvswitch      # Ensure the directory for OVS configuration files exists
+        - ovsdb-tool create /etc/openvswitch/conf.db /usr/share/openvswitch/vswitch.ovsschema
+        - ovsdb-server --remote=punix:/var/run/openvswitch/db.sock --remote=db:Open_vSwitch,Open_vSwitch,manager_options --pidfile --detach
+        - ovs-vswitchd --pidfile --detach
+        - ovs-vsctl add-br br0           # Add OVS bridge br0
+        - ovs-vsctl add-port br0 eth1    # Add eth1 to the bridge
+        - ovs-vsctl add-port br0 eth2    # Add eth2 to the bridge
+
+
+
+  
+  links:
+    - endpoints: ["workstation:eth1", "openvswitch:eth1"]
+    - endpoints: ["webserver:eth1", "openvswitch:eth2"]
