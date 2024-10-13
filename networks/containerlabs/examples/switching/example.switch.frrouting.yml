@@ -1,0 +1,36 @@
+name: example.switch.frrouting
+topology: 
+  nodes:
+    workstation1:
+      kind: linux
+      image: alpine
+      exec:
+        - apk update
+        - apk add iproute2 bash
+        - ip addr add 10.0.0.1/24 dev eth1
+        - ip link set eth1 up
+
+    workstation2:
+      kind: linux
+      image: alpine
+      exec:
+        - apk update
+        - apk add iproute2 bash
+        - ip addr add 10.0.0.2/24 dev eth1
+        - ip link set eth1 up
+
+
+    switch-1:
+      kind: linux 
+      image: frrouting/frr:latest
+      exec: 
+        - sh /config/config.switch.sh
+      binds:
+        - ./config/frrouting:/config
+
+
+
+  
+  links:
+    - endpoints: ["workstation1:eth1", "openvswitch:eth1"]
+    - endpoints: ["workstation2:eth1", "openvswitch:eth2"]
