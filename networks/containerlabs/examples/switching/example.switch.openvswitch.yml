@@ -3,6 +3,9 @@ topology:
   nodes:
     workstation1:
       kind: linux
+      labels:
+        graph-layer: 2   # Assign the switch layer clearly
+        graph-icon: host
       image: alpine
       exec:
         - apk update
@@ -12,6 +15,9 @@ topology:
 
     workstation2:
       kind: linux
+      labels:
+        graph-layer: 2   # Assign the switch layer clearly
+        graph-icon: host
       image: alpine
       exec:
         - apk update
@@ -22,6 +28,9 @@ topology:
 
     openvswitch:
       kind: linux 
+      labels:
+        graph-layer: 1   # Assign the switch layer clearly
+        graph-icon: switch
       image: alpine
       exec: 
         - apk update
