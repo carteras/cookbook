@@ -6,7 +6,7 @@ topology:
       image: alpine:latest
       labels:
         graph-icon: host
-        graph-layer: 1
+        graph-layer: 2
       exec:
         - apk update
         - apk add iproute2 bash
@@ -18,7 +18,7 @@ topology:
       image: alpine:latest
       labels:
         graph-icon: host
-        graph-layer: 2
+        graph-layer: 1
       exec:
         - apk update
         - apk add iproute2 bash
