@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 # Description: This script configures an IP address and brings up the network interface.
 # Usage: ./init.workstation.set-ssh.sh <IP_ADDRESS> <SUBNET_MASK> <INTERFACE>
 # Example: ./init.workstation.set-ssh.sh 192.168.1.100 24 eth0
