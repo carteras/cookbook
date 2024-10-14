@@ -1,9 +1,23 @@
 name: example.switch.frrouting
 topology: 
   nodes:
+    frrouting-switch:
+      kind: linux 
+      image: frrouting/frr:latest
+      labels:
+        graph-layer: 1   # Assign the switch layer clearly
+        graph-icon: switch
+      exec: 
+        - sh /config/config.switch.sh
+      binds:
+        - ./config/frrouting:/config
+
     workstation1:
       kind: linux
       image: alpine
+      labels:
+        graph-layer: 2   # Ensure clear separation for workstations
+        graph-icon: host
       exec:
         - apk update
         - apk add iproute2 bash
@@ -13,24 +27,16 @@ topology:
     workstation2:
       kind: linux
       image: alpine
+      labels:
+        graph-icon: host
+        graph-layer: 2   # Ensure clear separation for workstations
       exec:
         - apk update
         - apk add iproute2 bash
         - ip addr add 10.0.0.2/24 dev eth1
         - ip link set eth1 up
 
-
-    switch-1:
-      kind: linux 
-      image: frrouting/frr:latest
-      exec: 
-        - sh /config/config.switch.sh
-      binds:
-        - ./config/frrouting:/config
-
-
-
   
   links:
-    - endpoints: ["workstation1:eth1", "openvswitch:eth1"]
-    - endpoints: ["workstation2:eth1", "openvswitch:eth2"]
+    - endpoints: ["workstation1:eth1", "frrouting-switch:eth1"]
+    - endpoints: ["workstation2:eth1", "frrouting-switch:eth2"]
