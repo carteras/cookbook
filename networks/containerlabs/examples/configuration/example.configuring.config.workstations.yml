@@ -8,7 +8,7 @@ topology:
         graph-icon: host
         graph-layer: 1
       exec:
-        - sh /config/init.workstation.install-stuff.sh 
+        - sh /config/init.workstation.install-stuff.sh bash iproute2
         - sh /config/init.workstation.set-ip.sh 10.0.0.1 24 eth1
         - sh /config/init.workstation.add-user.sh testuser testgroup
       binds: 
@@ -21,7 +21,7 @@ topology:
         graph-icon: host
         graph-layer: 2
       exec:
-        - sh /config/init.workstation.install-stuff.sh
+        - sh /config/init.workstation.install-stuff.sh bash iproute2
         - sh /config/init.workstation.set-ip.sh 10.0.0.2 24 eth1
         - sh /config/init.workstation.add-user.sh
       binds: 
