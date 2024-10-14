@@ -1,0 +1,31 @@
+name: example.configuring.exec.workstations
+topology:
+  nodes:
+    workstation1:
+      kind: linux
+      image: alpine:latest
+      labels:
+        graph-icon: host
+        graph-layer: 1
+      exec:
+        - sh /config/init.workstation.install-stuff.sh 
+        - sh /config/init.workstation.set-ip.sh 10.0.0.1 24 eth1
+        - sh /config/init.workstation.add-user.sh testuser testgroup
+      binds: 
+        - ./config:/config
+
+    workstation2:
+      kind: linux
+      image: alpine:latest
+      labels:
+        graph-icon: host
+        graph-layer: 2
+      exec:
+        - sh /config/init.workstation.install-stuff.sh
+        - sh /config/init.workstation.set-ip.sh 10.0.0.2 24 eth1
+        - sh /config/init.workstation.add-user.sh
+      binds: 
+        - ./config:/config
+
+  links: 
+    - endpoints: ['workstation1:eth1', "workstation2:eth1"]
