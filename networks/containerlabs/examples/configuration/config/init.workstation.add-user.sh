@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 # Description: This script adds users and assigns them to multiple groups
 # Usage: ./init.workstation.add-user.sh <username> <password> [group1,group2,...]
 # Example: ./init.workstation.add-user.sh testuser password1 group1,group2
@@ -15,8 +15,8 @@ fi
 
 echo "Adding ${USERNAME} to this machine"
 
-# Split the GROUPS string by commas into an array
-IFS=',' read -ra GROUP_ARRAY <<< "$GROUPS"
+# Split the GROUPS string by commas into a list (sh doesn't support arrays)
+GROUP_ARRAY=$(echo "$GROUPS" | tr ',' ' ')
 
 # Create each group if it doesn't exist and add the user to each group
 for GROUP_NAME in "${GROUP_ARRAY[@]}"; do
