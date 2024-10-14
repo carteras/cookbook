@@ -1,4 +1,4 @@
-#!/bin/bash 
+#!/bin/sh 
 # Description: This script updates and installs a range of packages
 # Usage: ./init.workstation.install-stuff.sh [<PACKAGE_NAME> ... <PACKAGE_NAME>]
 # Example: ./init.workstation.install-stuff.sh bash iproute2
