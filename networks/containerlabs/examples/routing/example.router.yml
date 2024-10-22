@@ -1,1 +1,12 @@
-# not yet implemented
+name: example.router.simple
+topology:
+  nodes:
+    router:
+      kind: linux
+      image: frrouting/frr:latest
+      # exec: 
+      #   - sh /config/router.sh eth1 10.0.0.124 eth2 10.13.36.1/24 eth3 10.10.10.1/24
+      binds:
+        - ./config:/config
+
+      
