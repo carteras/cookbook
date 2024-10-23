@@ -13,16 +13,16 @@ apk add bash iproute2 openrc openssh rsyslog
 
 echo "setting up IP address"
 
-ip address add $MY_IP/$MY_SUBNET dev $MY_ETHERNET
-ip link set $MY_ETHERNET up
+ip address add $IP/$SUBNET dev $DEVICE
+ip link set $DEVICE up
 
 ip a s
 
 echo "Adding ${USER_NAME} to ssh server"
 
 addgroup $USER_NAME
-adduser -D -H $MY_USERNAME
-echo "${USER_NAME}:${PASSWORD}" | chpasswd
+adduser $USER_NAME
+echo "$USER_NAME:$PASSWORD" | chpasswd
 
 mkdir /home/${USER_NAME}
 chown root:${USER_NAME} /home/${USER_NAME}
