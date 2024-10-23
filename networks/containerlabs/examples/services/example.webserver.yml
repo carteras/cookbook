@@ -15,12 +15,14 @@ topology:
       image: alpine
       exec:
         - apk update
-        - apk add iproute2 bash nginx
+        - apk add iproute2 bash nginx curl
         - ip addr add 10.0.0.2/24 dev eth1
         - ip link set eth1 up
         - sh /config/configure.nginx.sh
       binds:
         - ./config/webserver:/config
+      ports:
+        - "8081:80/tcp"
 
 
     openvswitch:
