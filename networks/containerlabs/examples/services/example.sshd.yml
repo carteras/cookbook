@@ -1,1 +1,14 @@
-# not yet implemented
+name: example.sshd
+topology:
+  nodes:
+    workstation:
+      kind: linux
+      image: alpine:latest
+
+    ssh-server:
+      kind: linux
+      image: alpine:latest
+      exec: 
+        - sh /config/sshd/ssh-server.sh
+      binds:
+        - ./config/ssh:/config
