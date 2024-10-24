@@ -9,6 +9,8 @@ topology:
       kind: linux
       image: alpine:latest
       exec: 
-        - sh /config/sshd/ssh-server.sh
+        - sh /config/sshd/services.sshd.sh
       binds:
         - ./config/ssh:/config
+      ports:
+        - "2222:22/tcp"
