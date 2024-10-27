@@ -1,1 +1,59 @@
-# not yet implemented
+name: example.telnet 
+topology: 
+  nodes:
+    workstation: 
+      kind: linux
+      image: alpine:latest
+      exec:
+        - apk update
+        - apk add iproute2 
+        - ip addr add 10.0.0.1/24 dev eth1
+        - ip link set eth1 up 
+
+    telnet-server:
+      kind: linux
+      image: alpine:latest
+      exec:
+        - apk update
+        - apk add iproute2 busybox-extras iptables openrc
+        - ip addr add 10.0.0.2/24 dev eth1
+        - ip link set eth1 up
+        - adduser testuser -D
+        - echo "testuser:password1" | chpasswd
+        - openrc
+        - touch /run/openrc/softlevel
+        - rc-update add inetd default
+        - killall inetd || true  # Ensure no inetd is running
+        - inetd &                # Start inetd manually
+        - iptables -A INPUT -p tcp --dport 23 -j ACCEPT  # Allow port 23 through iptables
+        - echo "telnet stream tcp nowait testuser /usr/sbin/telnetd telnetd" > /etc/inetd.conf  # Create inetd.conf
+        - /usr/sbin/telnetd -l /bin/sh &
+
+
+
+        # - iptables -A INPUT -p tcp --dport 23 -j ACCEPT
+
+
+
+    openvswitch:
+        kind: linux 
+        labels:
+          graph-layer: 1   # Assign the switch layer clearly
+          graph-icon: switch
+        image: alpine
+        exec: 
+          - apk update
+          - apk add bash openvswitch
+          - mkdir -p /var/run/openvswitch  # Ensure the directory for OVS sockets and PID exists
+          - mkdir -p /etc/openvswitch      # Ensure the directory for OVS configuration files exists
+          - ovsdb-tool create /etc/openvswitch/conf.db /usr/share/openvswitch/vswitch.ovsschema
+          - ovsdb-server --remote=punix:/var/run/openvswitch/db.sock --remote=db:Open_vSwitch,Open_vSwitch,manager_options --pidfile --detach
+          - ovs-vswitchd --pidfile --detach
+          - ovs-vsctl add-br br0           # Add OVS bridge br0
+          - ovs-vsctl add-port br0 eth1    # Add eth1 to the bridge
+          - ovs-vsctl add-port br0 eth2    # Add eth2 to the bridge
+  links:
+    - endpoints: ['workstation:eth1','openvswitch:eth1']
+    - endpoints: ['telnet-server:eth1','openvswitch:eth2']
+
+  
