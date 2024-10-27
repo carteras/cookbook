@@ -5,7 +5,7 @@ topology:
       kind: linux
       image: alpine:latest
       exec:
-        - apk update
+        - apk update busybox-extras
         - apk add iproute2 
         - ip addr add 10.0.0.1/24 dev eth1
         - ip link set eth1 up 
