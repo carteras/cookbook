@@ -1,0 +1,10 @@
+#!/usr/bin/expect -f
+
+set timeout 10
+
+spawn telnet 10.0.0.2 23 
+
+send "cat /not_secret.flag\r"
+send "exit\r"
+
+expect eof
