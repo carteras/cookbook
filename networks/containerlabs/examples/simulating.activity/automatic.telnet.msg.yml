@@ -7,7 +7,7 @@ topology:
       exec:
         - apk update 
         - apk add iproute2 busybox-extras cronie openrc
-        - ip addr add 10.0.0.1/24 dev eth1
+        - ip addr add 10.0.0.1/24 dev eth1sudo 
         - ip link set eth1 up 
         - ip link set dev eth1 promisc on
         - rc-update add crond default   # Ensure cron is enabled on startup
@@ -55,26 +55,33 @@ topology:
 
 
         # - iptables -A INPUT -p tcp --dport 23 -j ACCEPT
-
-
-
     openvswitch:
-        kind: linux 
-        labels:
-          graph-layer: 1   # Assign the switch layer clearly
-          graph-icon: switch
-        image: alpine
-        exec: 
-          - apk update
-          - apk add bash openvswitch
-          - mkdir -p /var/run/openvswitch  # Ensure the directory for OVS sockets and PID exists
-          - mkdir -p /etc/openvswitch      # Ensure the directory for OVS configuration files exists
-          - ovsdb-tool create /etc/openvswitch/conf.db /usr/share/openvswitch/vswitch.ovsschema
-          - ovsdb-server --remote=punix:/var/run/openvswitch/db.sock --remote=db:Open_vSwitch,Open_vSwitch,manager_options --pidfile --detach
-          - ovs-vswitchd --pidfile --detach
-          - ovs-vsctl add-br br0           # Add OVS bridge br0
-          - ovs-vsctl add-port br0 eth1    # Add eth1 to the bridge
-          - ovs-vsctl add-port br0 eth2    # Add eth2 to the bridge
+      kind: linux
+      labels:
+        graph-layer: 1   # Assign the switch layer clearly
+        graph-icon: switch
+      image: alpine
+      exec:
+        - apk update
+        - apk add bash openvswitch tcpdump termshark
+        - mkdir -p /var/run/openvswitch  # Ensure the directory for OVS sockets and PID exists
+        - mkdir -p /etc/openvswitch      # Ensure the directory for OVS configuration files exists
+        - ovsdb-tool create /etc/openvswitch/conf.db /usr/share/openvswitch/vswitch.ovsschema
+        - ovsdb-server --remote=punix:/var/run/openvswitch/db.sock --remote=db:Open_vSwitch,Open_vSwitch,manager_options --pidfile --detach
+        - ovs-vswitchd --pidfile --detach
+        - ovs-vsctl add-br br0           # Add OVS bridge br0
+        - ovs-vsctl add-port br0 eth1    # Add eth1 to the bridge
+        - ovs-vsctl add-port br0 eth2    # Add eth2 to the bridge
+        - ovs-vsctl add-port br0 eth3    # Add eth2 to the bridge
+        - ovs-vsctl set bridge br0 other-config:disable-in-band=true  # Disable in-band control for hub-like behavior
+        - ovs-vsctl set-fail-mode br0 standalone                     # Set fail mode to standalone
+        - ovs-vsctl -- --id=@m create mirror name=mymirror select-all=true -- add bridge br0 mirrors @m  # Mirror all traffic
+        - ovs-vsctl add-port br0 mir-port -- set interface mir-port ofport_request=mirror-port
+        - tcpdump -i mir-port -w /tmp/telnet_traffic.pcap            # Start capturing mirrored traffic
+        - termshark -r /tmp/telnet_traffic.pcap
+
+
+    
   links:
     - endpoints: ['workstation:eth1','openvswitch:eth1']
     - endpoints: ['telnet-server:eth1','openvswitch:eth2']
