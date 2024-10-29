@@ -7,7 +7,7 @@ topology:
       exec:
         - apk update 
         - apk add iproute2 busybox-extras cronie openrc
-        - ip addr add 10.0.0.1/24 dev eth1sudo 
+        - ip addr add 10.0.0.1/24 dev eth1
         - ip link set eth1 up 
         - ip link set dev eth1 promisc on
         - rc-update add crond default   # Ensure cron is enabled on startup
@@ -25,7 +25,7 @@ topology:
       exec:
         - apk update
         - apk add iproute2 busybox-extras termshark openrc
-        - ip addr add 10.0.0.3/24 dev eth1
+        - ip addr add 10.0.0.2/24 dev eth1
         - ip link set dev eth1 promisc on
         - ip link set eth1 up
 
@@ -35,7 +35,7 @@ topology:
       exec:
         - apk update
         - apk add iproute2 busybox-extras iptables openrc
-        - ip addr add 10.0.0.2/24 dev eth1
+        - ip addr add 10.0.0.3/24 dev eth1
         - ip link set eth1 up
         - ip link set dev eth1 promisc on
 
@@ -72,7 +72,7 @@ topology:
         - ovs-vsctl add-br br0           # Add OVS bridge br0
         - ovs-vsctl add-port br0 eth1    # Add eth1 to the bridge
         - ovs-vsctl add-port br0 eth2    # Add eth2 to the bridge
-        - ovs-vsctl add-port br0 eth3    # Add eth2 to the bridge
+        - ovs-vsctl add-port br0 eth3    # Add eth2 to the bridgde
         - ovs-vsctl set bridge br0 other-config:disable-in-band=true  # Disable in-band control for hub-like behavior
         - ovs-vsctl set-fail-mode br0 standalone                     # Set fail mode to standalone
         - ovs-vsctl -- --id=@m create mirror name=mymirror select-all=true -- add bridge br0 mirrors @m  # Mirror all traffic
