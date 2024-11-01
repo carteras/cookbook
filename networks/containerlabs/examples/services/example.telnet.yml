@@ -6,14 +6,17 @@ topology:
       image: alpine:latest
       exec:
         - apk update 
-        - apk busybox-extras termshark busybox-extras 
-        - apk add iproute2 
+        - apk add busybox-extras termshark busybox-extras 
+        - apk add libcap
         - ip addr add 10.0.0.1/24 dev eth1
         - ip link set eth1 up 
         - ip link set eth1 promisc on  # Enable promiscuous mode on eth1
         - sh /config/services.sshd.sh 22
         - adduser -D foo
         - echo "foo:password" | chpasswd
+        - setcap cap_net_raw,cap_net_admin+eip /usr/bin/dumpcap
+        - usermod -aG wireshark foo
+
       binds:
         - config/ssh:/config
       ports:
