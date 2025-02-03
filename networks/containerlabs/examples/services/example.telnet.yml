@@ -6,8 +6,7 @@ topology:
       image: alpine:latest
       exec:
         - apk update 
-        - apk add busybox-extras termshark busybox-extras 
-        - apk add libcap
+        - apk add busybox-extras termshark libcap
         - ip addr add 10.0.0.1/24 dev eth1
         - ip link set eth1 up 
         - ip link set eth1 promisc on  # Enable promiscuous mode on eth1
@@ -15,12 +14,14 @@ topology:
         - adduser -D foo
         - echo "foo:password" | chpasswd
         - setcap cap_net_raw,cap_net_admin+eip /usr/bin/dumpcap
-        - usermod -aG wireshark foo
+        - addgroup wireshark  # Create wireshark group if not already present
+        - adduser foo wireshark
 
       binds:
         - config/ssh:/config
       ports:
         - 2225:22/tcp
+
 
     telnet-server:
       kind: linux
