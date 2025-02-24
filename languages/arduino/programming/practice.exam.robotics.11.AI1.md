@@ -30,10 +30,10 @@ D) Error: Invalid syntax
 
 3. Which of the following statements best describes the role of a condition in an Arduino if statement?
 
-A) It stores data in the microcontroller's memory.
-B) It continuously loops the code inside the if block.
-C) It evaluates to either true or false to control program flow.
-D) It assigns values to variables inside the if block.
+A) It stores data in the microcontroller's memory.  
+B) It continuously loops the code inside the if block.  
+C) It evaluates to either true or false to control program flow.  
+D) It assigns values to variables inside the if block.  
 
 4. Consider the following Arduino code:
 
@@ -42,7 +42,7 @@ int value = 5;
 
 void setup() {
   Serial.begin(9600);
-  int value = 10;  // Local variable
+  int value = 10;  
 
   if (value > 7) {
     Serial.println("High");
