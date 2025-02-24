@@ -143,6 +143,9 @@ void setup() {
     Serial.println("Threshold Met");
   } 
 
+  >! spoiler 
+  
+
   if (reading < threshold); {  // Issue 2?
     Serial.println("Below Threshold");
   }
@@ -155,7 +158,7 @@ void setup() {
     Serial.println("Threshold is Active");
   
   if (reading + 5 > threshold) {
-    reading = reading++;  // Issue 4?
+    reading = reading++;  // Issue 4?  
     Serial.println("Adjusted Reading: " + String(reading));
   }
 
