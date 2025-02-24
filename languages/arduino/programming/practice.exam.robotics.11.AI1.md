@@ -139,46 +139,75 @@ void setup() {
   
   reading = voltage + 3;
 
-  if (reading = threshold) {  // Issue 1?
+  if (reading = threshold) { 
     Serial.println("Threshold Met");
   } 
 
-  >! spoiler 
-  
+// Line: if (reading = threshold)
+// Issue: Assigns threshold to reading instead of comparing.
+// Fix: Replace with if (reading == threshold)
 
-  if (reading < threshold); {  // Issue 2?
+  if (reading < threshold); {  
     Serial.println("Below Threshold");
   }
+
+// Line: if (reading < threshold);
+// Issue: The semicolon ends the if statement prematurely
+// Fix: Remove the semicolon: if (reading < threshold)
 
   if (reading > threshold) {
     Serial.println("Above Threshold");
   }
 
-  if (threshold)  // Issue 3?
+  if (threshold) 
     Serial.println("Threshold is Active");
+
+// Line: if (threshold)
+// Issue: This checks if threshold is non-zero, not a specific condition.
+// Fix: Make the condition explicit, e.g., if (threshold > 0)
   
   if (reading + 5 > threshold) {
-    reading = reading++;  // Issue 4?  
+    reading = reading++;    
     Serial.println("Adjusted Reading: " + String(reading));
   }
 
-  if (reading - 3 = 5) {  // Issue 5?
+// Line: reading = reading++;
+// Issue: Post-increment returns the original value before incrementing, so the assignment cancels the increment.
+// Fix: Use reading++; or reading += 1;
+
+  if (reading - 3 = 5) {  
     Serial.println("Special Condition Met");
   }
+// Line: if (reading - 3 = 5)
+// Issue: Uses = instead of == for comparison.
+// Fix: Change to if (reading - 3 == 5)
+
 
   if (voltage) {
-    int voltage = 12;  // Issue 6?
+    int voltage = 12; 
     Serial.println("Voltage: " + String(voltage));
   }
 
-  if (threshold = 0) {  // Issue 7?
+// Line: int voltage = 12; inside the if block
+// Issue: Declares a new local voltage, hiding the global one, leading to potential confusion.
+// Fix: Remove int to use the global variable: voltage = 12;
+
+
+  if (threshold == 0) (  
     Serial.println("Threshold Disabled");
-  }
+  )
+
+// Line: if (threshold == 0) ( (and technically the last line of the condition)
+// Issue: wrong bracing leading to a complation error
+// Fix: Use appropriate bracing { } instead of ( )
+
 }
 
 void loop() {}
 
 ```
+
+
 
 Identify at least 5 unique issues in the code.
 For each issue:
@@ -375,17 +404,23 @@ void setup() {
 
   resetSensor(sensorValue);
   Serial.println("Sensor After Reset: " + String(sensorValue));
+
+  missingParameter(sensorValue);
 }
 
 void loop() {}
 
 int getSensorReading() {
   int value = 40;
-  return;  // Issue 1?
+  return;  
 }
 
+// Line: return;
+// Issue: The function is declared to return an int but returns nothing.
+// Fix: Replace with return value;
+
 bool checkThreshold(int value) {
-  if (value = threshold) {  // Issue 2?
+  if (value = threshold) { 
     return true;
   }
   if (value > threshold) {
@@ -394,14 +429,22 @@ bool checkThreshold(int value) {
   return false;
 }
 
+// Line: if (value = threshold)
+// Issue: Assigns threshold to value instead of comparing.
+// Fix: Use if (value == threshold)
+
 int doubleValue(int value) {
   value = value * 2;
   return value;
 }
 
 void resetSensor(int value) {
-  value = 0;  // Issue 3?
+  value = 0;  
 }
+
+// Line: value = 0;
+// Issue: The parameter is passed by value, so changes won’t affect the original variable.
+// Fix: Pass by reference: void resetSensor(int &value)
 
 bool isPositive(int number) {
   if (number > 0)
@@ -410,18 +453,32 @@ bool isPositive(int number) {
     return;  // Issue 4?
 }
 
+// Line: return;
+// Issue: The function expects a bool return but returns nothing.
+// Fix: Replace with return false;
+
 int faultyOperation(int num) {
-  return num +;  // Issue 5?
+  return num +;  
 }
+// Line: return num +;
+// Issue: Incomplete expression causes a compilation error.
+// Fix: Complete the expression, e.g., return num + 5;
 
-int noReturnValue(int num) {  // Issue 6?
+int noReturnValue(int num) {  
   int result = num * 3;
-  // Missing return statement
 }
 
-void missingParameter() {  // Issue 7?
+// Line: No return statement present.
+// Issue: The function is declared to return an int but doesn’t return anything.
+// Fix: Add return result; at the end.
+
+void missingParameter() {  
   Serial.println("Missing Parameter Example");
 }
+
+// Line: void missingParameter()
+// Issue: The function is defined without parameters but should be called with one based on context.
+// Fix: Either modify the function to accept a parameter or update its call accordingly.
 
 ```
 
@@ -605,48 +662,33 @@ void loop() {}
 
 List the exact sequence of printed lines.
 
-6. Agatha is working on her Arduino project, aiming to control a series of lights using loops. Her goal is to turn 5 lights ON one by one and then turn them OFF in reverse order. However, the Serial Monitor isn’t showing the expected results, and there seem to be multiple issues in her code. Here’s Agatha’s code:
-
-
-```cpp
-void setup() {
-  Serial.begin(9600);
-  
-  int lightNumber = 1;
-
-  while (lightNumber <= 5); {  // Issue 1?
-    Serial.println("Turning ON light: " + String(lightNum));  // Issue 2?
-    lightNumber++;
-  }
-
-  for (int i = 5; i > 0; i--); {  // Issue 3?
-    Serial.println("Turning OFF light: " + String(i));
-  }
-
-  int totalLights;
-  if (totalLights = 5) {  // Issue 4?
-    Serial.println("Total lights set to 5");
-  }
-
-  for (int j = 1; j <= 5; j++) {  
-    Serial.println("Light " + String(j) + " is " + status);  // Issue 5?
-  }
-
-  Serial.println("All lights handled.");
-}
-
-void loop() {}
-
-```
-
-1. What will the Serial Monitor actually print when the code runs?
-2. Identify at least 5 unique issues in the code.
-3. Explain how each issue affects the program and provide the correct fix.
-
 
 
 
 ## Circuits 
+
+### If you directly connect an LED to the 5V pin on the Arduino without a resistor, what is the most likely outcome?
+
+![alt text](languages/arduino/programming/images/image.png)
+
+
+
+A) The LED will work normally.
+B) The LED will shine brighter but will be fine.
+C) The LED will burn out or possibly damage the Arduino.
+D) The Arduino will automatically limit the current.
+
+### What is the purpose of the resistor in this circuit?
+
+
+
+![](languages/arduino/programming/images/image-1.png)
+
+A) To limit the current flowing through the button when pressed.
+B) To act as a pull-down resistor, ensuring the input pin reads LOW when the button is unpressed.
+C) To protect the pushbutton from voltage spikes.
+D) To reduce the LED brightness when the button is pressed.
+
 
 
 
