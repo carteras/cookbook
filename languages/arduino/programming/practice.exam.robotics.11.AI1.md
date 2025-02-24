@@ -673,10 +673,10 @@ List the exact sequence of printed lines.
 
 
 
-A) The LED will work normally.
-B) The LED will shine brighter but will be fine.
-C) The LED will burn out or possibly damage the Arduino.
-D) The Arduino will automatically limit the current.
+A) The LED will work normally.   
+B) The LED will shine brighter but will be fine.   
+C) The LED will burn out or possibly damage the Arduino.   
+D) The Arduino will automatically limit the current.   
 
 ### What is the purpose of the resistor in this circuit?
 
@@ -684,10 +684,10 @@ D) The Arduino will automatically limit the current.
 
 ![](languages/arduino/programming/images/image-1.png)
 
-A) To limit the current flowing through the button when pressed.
-B) To act as a pull-down resistor, ensuring the input pin reads LOW when the button is unpressed.
-C) To protect the pushbutton from voltage spikes.
-D) To reduce the LED brightness when the button is pressed.
+A) To limit the current flowing through the button when pressed.   
+B) To act as a pull-down resistor, ensuring the input pin reads LOW when the button is unpressed.   
+C) To protect the pushbutton from voltage spikes.   
+D) To reduce the LED brightness when the button is pressed.   
 
 
 
@@ -695,4 +695,32 @@ D) To reduce the LED brightness when the button is pressed.
 ## Composite questions 
 
 
+![alt text](languages/arduino/programming/images/image-3.png)
 
+Using the above circuit as a guide, 
+
+```cpp
+const int buttonPin = 2;
+const int ledPin = 13;
+int buttonState = 0;
+
+void setup() {
+  pinMode(buttonPin, INPUT);
+  pinMode(ledPin, OUTPUT);
+}
+
+void loop() {
+  buttonState = digitalRead(buttonPin);
+
+  if (buttonState == HIGH) {
+    digitalWrite(ledPin, HIGH);
+  } else {
+    digitalWrite(ledPin, LOW);
+  }
+}
+```
+
+A) The LED will turn ON only when the button is pressed and turn OFF when released.   
+B) The LED will always stay ON, regardless of the button press.   
+C) The LED will never turn ON, even when the button is pressed.   
+D) The LED will blink repeatedly when the button is pressed.   
