@@ -40,7 +40,7 @@ We need to make sure that the local network is a real IP address (not behind NAT
 
 Before we can use both networks, we need to install a second network card onto our virtual machine. We do this by opening `virt-manager` and double clicking on your VM. 
 
-![open virt-manager](os/images/image.png.png)
+![open virt-manager](os/imgs/image.png.png)
 
 
 Click the little lightbulb and you will see the device manager for your Virtual Machine. 
