@@ -1,8 +1,6 @@
 # Primer: Understanding `while` Loops in Bash
 
-This lecture introduces the **concept** of `while` loops in Bash before we dive into cookbook recipes.
 
----
 
 ## What is a `while` loop?
 
