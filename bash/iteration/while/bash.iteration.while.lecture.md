@@ -19,6 +19,8 @@ done
 * If the condition evaluates to true (exit status `0`), the body executes.
 * Once the condition becomes false (exit status non-zero), the loop stops.
 
+Reminder: In bash, a condition is a command (often inside `[ … ]`, `[[ … ]]`, or as part of test) that evaluates to an exit status: `0` means true (success) and `any non-zero value` means false (failure). Conditions are typically used in control structures like if, while, and until to decide the flow of execution.
+
 ---
 
 ## Example: Simple counter
