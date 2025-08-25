@@ -2,6 +2,7 @@
 
 ## Iteration 
 
+- [while loop lecture](bash.iteration.while.lecture.md)
 - [while loop cheat sheet](bash.iteration.while.cheat.md)
 - [while problems](bash.iteration.while.problems.md)
 
