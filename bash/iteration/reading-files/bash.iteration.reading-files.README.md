@@ -1,7 +1,8 @@
 # Bash Cookbook: Reading Files
 
-This index organizes the core recipes into three levels: **easy**, **intermediate**, and **hard**.  
-Click on a problem to jump directly to the recipe.
+
+- [lecture](bash.iteration.reading-files.lecture.md)
+- [cheat sheet](bash.iteration.reading-files.cheat-sheet.md)
 
 ---
 
