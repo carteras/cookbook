@@ -6,7 +6,7 @@ This cookbook contains a series of short problem–solution guides for using **E
 
 ## Extras
 
-- [exiftool.cheatsheet.md](exiftool.cheatsheet.md) — compact summary of all solution steps  
+- [exiftool lecture](exiftool/exiftool.lecture.md)
 - [exiftool.README.md](exiftool.README.md) — this index file  
 
 ---
