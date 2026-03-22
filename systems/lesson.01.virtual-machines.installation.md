@@ -63,6 +63,8 @@ If you get a number greater than `0`, you're good to go. If you get `0`, you'll 
 
 ### Step 1.2 — Install QEMU/KVM and virt-manager
 
+If you are at home working on virtual box
+
 ```bash
 sudo dnf install -y qemu-kvm libvirt virt-manager virt-install
 ```

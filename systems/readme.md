@@ -20,7 +20,7 @@ A practical, hands-on course for people building and managing Linux servers for 
 
 ## Image Placeholders
 
-Several lessons reference screenshots that need to be captured on a working Fedora 43 system. They are marked in each lesson with `📌 IMAGE PLACEHOLDER`. Here's a master list:
+Several lessons reference screenshots still need to be captured on a working Fedora 43 system. They are marked in each lesson with `📌 IMAGE PLACEHOLDER`. Here's a master list:
 
 ### Lesson 1
 1. virt-manager ISO browser dialog — file picker with Fedora ISO selected
