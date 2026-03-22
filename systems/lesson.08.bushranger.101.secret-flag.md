@@ -45,23 +45,23 @@ The access control setup we're building looks like this:
 ```
 /home/bushranger101/
 │
-├── secret.flag              ← The flag file
-│   ├── owner:  admin_user   (your wheel account) — can read and write
+├── secret.flag         ← The flag file
+│   ├── owner:  your_username    (your admin account) — can read and write
 │   ├── group:  bushranger101 (the player's account) — can read only
-│   └── others:              — no access at all
+│   └── others:         — no access at all
 │
 ├── .bashrc, .bash_logout, .bash_profile
-│   ├── owner:  admin_user   (your wheel account) — can read and write
+│   ├── owner:  bushranger101 — can read and write
 │   ├── group:  bushranger101 — can read only
-│   └── others:              — no access at all
+│   └── others:         — no access at all
 │
 └── (the directory itself)
-    ├── owner:  admin_user   — can read, write, and enter
-    ├── group:  bushranger101 — can read and enter (but not create/delete)
-    └── others:              — no access at all
+    ├── owner:  adam    — can read, write, and enter
+    ├── group:  bushranger101 — can read and enter (but not create/delete files)
+    └── others:         — no access at all
 ```
 
-The player (`bushranger101`) can enter their home directory and read the flag and config files — but can't modify any of them. Your admin account owns and controls everything.
+The player (`bushranger101`) can enter their own home directory and read the flag — but can't modify it. Your admin account (`adam`) owns and controls everything.
 
 ---
 
@@ -98,7 +98,7 @@ ls /home
 ```
 
 ```
-admin_user  bushranger101
+adam  bushranger101
 ```
 
 ---
@@ -134,7 +134,7 @@ Takes that text and computes its MD5 hash. `md5sum` outputs the hash followed by
 echo "my_flag" | md5sum
 ```
 ```
-a43c1b0aa53a0c908810c06ab1ff3967  -
+1c629e9f1e8b7dd35dc99abf200ef56c  -
 ```
 
 The `-` means "input came from stdin, not a file". We don't want that in our flag.
@@ -147,7 +147,7 @@ The `-` means "input came from stdin, not a file". We don't want that in our fla
 echo "my_flag" | md5sum | cut -d " " -f1
 ```
 ```
-a43c1b0aa53a0c908810c06ab1ff3967
+1c629e9f1e8b7dd35dc99abf200ef56c
 ```
 
 **Stage 4: `> /home/bushranger101/secret.flag`**
@@ -167,7 +167,7 @@ cat /home/bushranger101/secret.flag
 ```
 
 ```
-a43c1b0aa53a0c908810c06ab1ff3967
+1c629e9f1e8b7dd35dc99abf200ef56c
 ```
 
 > 💡 **Tip for building real wargames:** Change `"my_flag"` to something secret that only you know — a phrase, a random string, anything. The MD5 hash is what the player finds; they don't need to know what you hashed to produce it. You can always regenerate the same hash by running the same `echo` again.
@@ -181,11 +181,11 @@ ls -la /home/bushranger101/
 ```
 total 24
 drwx------ 2 bushranger101 bushranger101 4096 Jan 01 11:00 .
-drwxr-xr-x 5 root          root          4096 Jan 01 11:00 ..
+drwxr-xr-x 5 root    root    4096 Jan 01 11:00 ..
 -rw-r--r-- 1 bushranger101 bushranger101  220 Jan 01 11:00 .bash_logout
 -rw-r--r-- 1 bushranger101 bushranger101 3526 Jan 01 11:00 .bashrc
 -rw-r--r-- 1 bushranger101 bushranger101  141 Jan 01 11:00 .bash_profile
--rw-r--r-- 1 admin_user    admin_user      33 Jan 01 11:00 secret.flag
+-rw-r--r-- 1 adam    adam      33 Jan 01 11:00 secret.flag
 ```
 
 Right now everything is too open. We need to lock it all down.
@@ -195,11 +195,11 @@ Right now everything is too open. We need to lock it all down.
 ### Step 3 — Own the Flag File Correctly
 
 We want:
-- **User owner**: `admin_user` (your wheel account) — already the case since you created it
+- **User owner**: `adam` (your wheel/admin account) — already the case since you created it
 - **Group owner**: `bushranger101` — so the player can read it via group permissions
 
 ```bash
-sudo chown admin_user:bushranger101 /home/bushranger101/secret.flag
+sudo chown adam:bushranger101 /home/bushranger101/secret.flag
 ```
 
 Verify:
@@ -209,7 +209,7 @@ ls -la /home/bushranger101/ | grep secret
 ```
 
 ```
--rw-r--r-- 1 admin_user    bushranger101   33 Jan 01 11:00 secret.flag
+-rw-r--r-- 1 adam    bushranger101   33 Jan 01 11:00 secret.flag
 ```
 
 Group is now `bushranger101`. Good. Permissions still need work — others can currently read it.
@@ -223,9 +223,9 @@ Target permission scheme for `secret.flag`:
 ```
 -  rw-  r--  ---
 │   │    │    │
-│   │    │    └── Others:                no access
+│   │    │    └── Others:         no access
 │   │    └─────── Group (bushranger101): read only
-│   └──────────── User  (admin_user):    read and write
+│   └──────────── User  (adam):    read and write
 └──────────────── Regular file
 ```
 
@@ -248,29 +248,23 @@ ls -la /home/bushranger101/ | grep secret
 ```
 
 ```
--rw-r----- 1 admin_user    bushranger101   33 Jan 01 11:00 secret.flag
+-rw-r----- 1 adam    bushranger101   33 Jan 01 11:00 secret.flag
 ```
 
 ---
 
-### Step 5 — Take Ownership of and Lock Down the Bash Config Files
+### Step 5 — Lock Down the Bash Config Files
 
-When `useradd` created the account, it placed `.bashrc`, `.bash_logout`, and `.bash_profile` in the directory owned by `bushranger101`. We want `admin_user` to own these — just like the flag file — while `bushranger101` gets read-only access via the group.
+The `.bash*` files in the player's directory should be readable by the player and their group, but completely invisible to everyone else.
 
-First, transfer ownership of all `.bash*` files to `admin_user`, keeping `bushranger101` as the group:
-
-```bash
-sudo chown admin_user:bushranger101 /home/bushranger101/.bash*
-```
-
-Now set the permissions. The target scheme for `.bashrc`, `.bash_logout`, `.bash_profile`:
+Target permission scheme for `.bashrc`, `.bash_logout`, `.bash_profile`:
 
 ```
 -  rw-  r--  ---
 │   │    │    │
-│   │    │    └── Others:                no access
+│   │    │    └── Others:          no access
 │   │    └─────── Group (bushranger101): read only
-│   └──────────── User  (admin_user):    read and write
+│   └──────────── User  (bushranger101): read and write
 └──────────────── Regular file
 ```
 
@@ -287,14 +281,14 @@ ls -la /home/bushranger101/
 ```
 total 24
 drwx------ 2 bushranger101 bushranger101 4096 Jan 01 11:00 .
-drwxr-xr-x 5 root          root          4096 Jan 01 11:00 ..
--rw-r----- 1 admin_user    bushranger101  220 Jan 01 11:00 .bash_logout
--rw-r----- 1 admin_user    bushranger101 3526 Jan 01 11:00 .bashrc
--rw-r----- 1 admin_user    bushranger101  141 Jan 01 11:00 .bash_profile
--rw-r----- 1 admin_user    bushranger101   33 Jan 01 11:00 secret.flag
+drwxr-xr-x 5 root    root    4096 Jan 01 11:00 ..
+-rw-r----- 1 bushranger101 bushranger101  220 Jan 01 11:00 .bash_logout
+-rw-r----- 1 bushranger101 bushranger101 3526 Jan 01 11:00 .bashrc
+-rw-r----- 1 bushranger101 bushranger101  141 Jan 01 11:00 .bash_profile
+-rw-r----- 1 adam    bushranger101   33 Jan 01 11:00 secret.flag
 ```
 
-All four files now have `rw-r-----` with `admin_user` as owner. This matches exactly what a real wargame level looks like — the player can read everything in their home directory, but can't tamper with any of it.
+All files now have `rw-r-----`. 
 
 ---
 
@@ -302,14 +296,14 @@ All four files now have `rw-r-----` with `admin_user` as owner. This matches exa
 
 The directory itself needs its own permission scheme. We want:
 
-- `admin_user` to be the owner (so we can manage the contents)
+- `adam` to be the owner (so we can manage the contents)
 - `bushranger101` group to be able to enter and list the directory
 - Others to have no access at all
 
-First, transfer ownership of the directory to `admin_user`, keeping `bushranger101` as the group:
+First, transfer ownership of the directory to `adam`, keeping `bushranger101` as the group:
 
 ```bash
-sudo chown admin_user:bushranger101 /home/bushranger101
+sudo chown adam:bushranger101 /home/bushranger101
 ```
 
 Now set the directory permissions:
@@ -319,9 +313,9 @@ Target permission scheme for `/home/bushranger101/`:
 ```
 d  rwx  r-x  ---
 │   │    │    │
-│   │    │    └── Others:                no access
+│   │    │    └── Others:          no access
 │   │    └─────── Group (bushranger101): read and enter (but can't create/delete)
-│   └──────────── User  (admin_user):    full control
+│   └──────────── User  (adam):    full control
 └──────────────── Directory
 ```
 
@@ -337,13 +331,13 @@ ls -la /home/
 
 ```
 total 16
-drwxr-xr-x  5 root        root          4096 Jan 01 11:00 .
-drwxr-xr-x 23 root        root          4096 Jan 01 09:00 ..
-drwx------  4 admin_user  admin_user    4096 Jan 01 09:30 admin_user
-drwxr-x---  2 admin_user  bushranger101 4096 Jan 01 11:00 bushranger101
+drwxr-xr-x  5 root  root    4096 Jan 01 11:00 .
+drwxr-xr-x 23 root  root    4096 Jan 01 09:00 ..
+drwx------  4 adam  adam    4096 Jan 01 09:30 adam
+drwxr-x---  2 adam  bushranger101 4096 Jan 01 11:00 bushranger101
 ```
 
-The directory now shows `drwxr-x---` with `admin_user:bushranger101` ownership.
+The directory now shows `drwxr-x---` with `adam:bushranger101` ownership.
 
 ---
 
@@ -357,23 +351,23 @@ ls -la /home/bushranger101/
 
 ```
 total 24
-drwxr-x--- 2 admin_user    bushranger101 4096 Jan 01 11:00 .
-drwxr-xr-x 5 root          root          4096 Jan 01 11:00 ..
--rw-r----- 1 admin_user    bushranger101  220 Jan 01 11:00 .bash_logout
--rw-r----- 1 admin_user    bushranger101 3526 Jan 01 11:00 .bashrc
--rw-r----- 1 admin_user    bushranger101  141 Jan 01 11:00 .bash_profile
--rw-r----- 1 admin_user    bushranger101   33 Jan 01 11:00 secret.flag
+drwxr-x--- 2 adam    bushranger101 4096 Jan 01 11:00 .
+drwxr-xr-x 5 root    root    4096 Jan 01 11:00 ..
+-rw-r----- 1 bushranger101 bushranger101  220 Jan 01 11:00 .bash_logout
+-rw-r----- 1 bushranger101 bushranger101 3526 Jan 01 11:00 .bashrc
+-rw-r----- 1 bushranger101 bushranger101  141 Jan 01 11:00 .bash_profile
+-rw-r----- 1 adam    bushranger101   33 Jan 01 11:00 secret.flag
 ```
 
 Check it against our target:
 
 | File | Owner | Group | Permissions | ✓ |
 |------|-------|-------|-------------|---|
-| `/home/bushranger101` (dir) | admin_user | bushranger101 | `rwxr-x---` | ✓ |
-| `secret.flag` | admin_user | bushranger101 | `rw-r-----` | ✓ |
-| `.bashrc` | admin_user | bushranger101 | `rw-r-----` | ✓ |
-| `.bash_logout` | admin_user | bushranger101 | `rw-r-----` | ✓ |
-| `.bash_profile` | admin_user | bushranger101 | `rw-r-----` | ✓ |
+| `/home/bushranger101` (dir) | adam | bushranger101 | `rwxr-x---` | ✓ |
+| `secret.flag` | adam | bushranger101 | `rw-r-----` | ✓ |
+| `.bashrc` | bushranger101 | bushranger101 | `rw-r-----` | ✓ |
+| `.bash_logout` | bushranger101 | bushranger101 | `rw-r-----` | ✓ |
+| `.bash_profile` | bushranger101 | bushranger101 | `rw-r-----` | ✓ |
 
 ---
 
@@ -390,7 +384,7 @@ cat ~/secret.flag
 ```
 
 ```
-a43c1b0aa53a0c908810c06ab1ff3967
+1c629e9f1e8b7dd35dc99abf200ef56c
 ```
 
 The player can read the flag. Now try to modify it:
@@ -403,24 +397,14 @@ echo "cheating" > ~/secret.flag
 bash: /home/bushranger101/secret.flag: Permission denied
 ```
 
-Try to modify a config file too:
-
-```bash
-echo "export PATH=/evil:$PATH" >> ~/.bashrc
-```
-
-```
-bash: /home/bushranger101/.bashrc: Permission denied
-```
-
 And try to access another user's home directory:
 
 ```bash
-ls /home/admin_user
+ls /home/adam
 ```
 
 ```
-ls: cannot open directory '/home/admin_user': Permission denied
+ls: cannot open directory '/home/adam': Permission denied
 ```
 
 Everything is locked down correctly. Type `exit` to return to your admin account.
@@ -472,33 +456,21 @@ sudo passwd bushranger101
 # 2. Generate and write the flag
 echo "my_flag" | md5sum | cut -d " " -f1 > /home/bushranger101/secret.flag
 
-# 3. Set flag ownership: admin_user owns it, bushranger101 group can read
-sudo chown admin_user:bushranger101 /home/bushranger101/secret.flag
+# 3. Set flag ownership: admin owns it, bushranger101 group can read
+sudo chown adam:bushranger101 /home/bushranger101/secret.flag
 
-# 4. Set flag permissions: admin_user rw, bushranger101 group r, others nothing
+# 4. Set flag permissions: admin rw, bushranger101 group r, others nothing
 sudo chmod u=rw,g=r,o= /home/bushranger101/secret.flag
 
-# 5. Take ownership of bash config files and lock them down the same way
-sudo chown admin_user:bushranger101 /home/bushranger101/.bash*
+# 5. Lock down bash config files: bushranger101 rw, group r, others nothing
 sudo chmod u=rw,g=r,o= /home/bushranger101/.bash*
 
-# 6. Give admin_user ownership of the directory, keep bushranger101 as group
-sudo chown admin_user:bushranger101 /home/bushranger101
+# 6. Give admin ownership of the directory, keep bushranger101 as group
+sudo chown adam:bushranger101 /home/bushranger101
 
-# 7. Set directory permissions: admin_user rwx, bushranger101 group rx, others nothing
+# 7. Set directory permissions: admin rwx, bushranger101 group rx, others nothing
 sudo chmod u=rwx,g=rx,o= /home/bushranger101
 ```
-
----
-
-## Going Further
-
-Now that you understand how these challenges are constructed, try these extensions:
-
-
-**Extension 1 — Hidden in plain sight:** create `bushranger102` and instead of `secret.flag`, hide the flag in by using `.` Try making it in a hidden directory.
-
-**Extension 2 — Multi-level chain:** Create `bushranger103` whose flag is hidden inside `bushranger102`'s directory. Only `bushranger102` can read it. The challenge: log in as `bushranger102` to find `bushranger103`'s flag, then use it to SSH in as `bushranger103` which will have it's own `secret.flag`.
 
 ---
 
