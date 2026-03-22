@@ -1,145 +1,63 @@
-# TL;DR SSH  
+# tldr: ssh
 
-## Introduction
-Secure Shell (SSH) is a cryptographic network protocol that allows secure communication between devices over an unsecured network. It's widely used for remote system administration, secure file transfers, and tunneling.
+## Description
 
----
-
-## 1. **Basic SSH Connection**
-### 🔹 Connect to a remote server
-```sh
-ssh username@remote_host
-```
-- `username`: Your login name on the remote machine.
-- `remote_host`: The IP address or domain of the server.
+Opens a secure, encrypted shell session on a remote machine over the network. Once connected, you get a terminal on the remote machine as if you were sitting in front of it. The most common tool for managing servers remotely.
 
 ---
 
-## 2. **Using SSH Keys (Passwordless Login)**
-### 🔹 Generate SSH Key Pair
-```sh
-ssh-keygen -t rsa -b 4096
-```
-- Saves keys in `~/.ssh/id_rsa` (private) and `~/.ssh/id_rsa.pub` (public).
+## Simple Examples
 
-### 🔹 Copy Public Key to Server
-```sh
-ssh-copy-id username@remote_host
-```
-- Enables passwordless login.
+```bash
+# Connect to a remote host as a specific user
+ssh admin_user@192.168.122.15
 
----
+# Connect on a non-default port
+ssh admin_user@192.168.122.15 -p 2222
 
-## 3. **Securely Copying Files with SCP**
-### 🔹 Copy a file from local to remote
-```sh
-scp localfile.txt username@remote_host:/remote/directory/
-```
+# Connect using a specific private key file
+ssh -i ~/.ssh/id_rsa admin_user@192.168.122.15
 
-### 🔹 Copy a file from remote to local
-```sh
-scp username@remote_host:/remote/file.txt ./
-```
+# Run a single command on the remote host and return
+ssh admin_user@192.168.122.15 "whoami"
 
-### 🔹 Copy directories recursively
-```sh
-scp -r local_directory username@remote_host:/remote/directory/
+# Enable verbose output (useful for debugging connection issues)
+ssh -v admin_user@192.168.122.15
+
+# Forward a local port to a remote service (port tunnelling)
+ssh -L 8080:localhost:80 admin_user@192.168.122.15
 ```
 
 ---
 
-## 4. **Using rsync for Faster Transfers**
-### 🔹 Sync local and remote directories efficiently
-```sh
-rsync -avz local_directory/ username@remote_host:/remote/directory/
-```
-- `-a`: Archive mode (preserves permissions, timestamps, symbolic links).
-- `-v`: Verbose mode.
-- `-z`: Compresses data for faster transfer.
+## Composite Example
 
----
+Connecting to a wargame VM from your host machine on port 2222, then verifying you're in the right place:
 
-## 5. **SSH Tunneling (Port Forwarding)**
-### 🔹 Forward local port to a remote machine
-```sh
-ssh -L local_port:target_host:target_port username@remote_host
-```
-- Example: Access a web service on a remote server locally
-```sh
-ssh -L 8080:localhost:80 username@remote_host
-```
+```bash
+# From your host machine
+ssh bushranger101@10.13.37.42 -p 2222
+# The authenticity of host '10.13.37.42' can't be established.
+# Are you sure you want to continue connecting (yes/no)? yes
+# bushranger101@10.13.37.42's password:
 
----
+# Now you're on the remote machine
+whoami
+# bushranger101
 
-## 6. **Multiplexing SSH Sessions**
-### 🔹 Speed up repeated SSH connections
-```sh
-echo "
-Host *
-    ControlMaster auto
-    ControlPath ~/.ssh/control-%r@%h:%p
-    ControlPersist 10m
-" >> ~/.ssh/config
-```
-- Prevents multiple authentications for subsequent connections.
+cat ~/secret.flag
+# a43c1b0aa53a0c908810c06ab1ff3967
 
----
-
-## 7. **Managing SSH Sessions**
-### 🔹 Run a command on a remote server
-```sh
-ssh username@remote_host 'ls -lah /var/log'
-```
-
-### 🔹 Keep an SSH session alive
-```sh
-ssh -o ServerAliveInterval=60 username@remote_host
-```
-
-### 🔹 Disconnect but keep processes running
-```sh
-nohup my_command &
+exit
+# Connection to 10.13.37.42 closed.
 ```
 
 ---
 
-## 8. **SSH Configuration for Convenience**
-### 🔹 Simplify SSH with `~/.ssh/config`
-```sh
-echo "
-Host myserver
-    HostName remote_host
-    User username
-    IdentityFile ~/.ssh/id_rsa
-" >> ~/.ssh/config
-```
-Then, connect with:
-```sh
-ssh myserver
-```
+## Notes for Students
 
----
-
-## 9. **Troubleshooting SSH Issues**
-### 🔹 Debugging SSH connections
-```sh
-ssh -v username@remote_host
-```
-
-### 🔹 Restart SSH service (on the server)
-```sh
-sudo systemctl restart ssh
-```
-
-### 🔹 Fixing permission issues
-```sh
-chmod 600 ~/.ssh/id_rsa
-chmod 644 ~/.ssh/id_rsa.pub
-chmod 700 ~/.ssh
-```
-
----
-
-## Conclusion
-SSH is a powerful tool for remote system access, file transfers, and secure tunneling. Mastering its basics will make remote system management more efficient and secure. Practice these commands to become proficient!
-
+- The first time you connect to a host, SSH will ask you to verify its fingerprint. Type `yes` to accept and it won't ask again for that host.
+- **Port 22 is the default.** We use `2222` in this course to avoid conflicts if your host also runs SSH. Always specify `-p 2222` when connecting to your VM.
+- SSH stores known hosts in `~/.ssh/known_hosts`. If you rebuild a VM and try to reconnect, you may get a "WARNING: REMOTE HOST IDENTIFICATION HAS CHANGED" error — this is SSH protecting you from a potential attack. If you know the host changed legitimately (you just rebuilt it), remove the old entry: `ssh-keygen -R 10.13.37.42`
+- In a wargame, SSH is how players progress between levels. They find the password for the next level and SSH in as that user.
+- `ssh-keygen` creates a public/private key pair for passwordless authentication — more secure than passwords and worth learning once you're comfortable with the basics.

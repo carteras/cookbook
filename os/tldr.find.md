@@ -1,53 +1,80 @@
-# find
+# tldr: find
 
-Search for files in a directory hierarchy based on various criteria such as name, owner, group, and size.
+## Description
 
-## Examples
+Searches the filesystem for files and directories matching criteria you specify — name, type, owner, permissions, size, modification time, and more. Unlike `grep` (which searches inside files), `find` searches for the files themselves. In CTF and wargame contexts it's the primary tool for locating hidden flags.
 
-- Find files by name:
+---
 
-  `find <path/to/search> -name "<filename>"`
+## Simple Examples
 
-- Find files owned by a specific user:
+```bash
+# Find all files named "secret.flag" anywhere under /home
+find /home -name "secret.flag"
 
-  `find <path/to/search> -user <username>`
+# Find files with a case-insensitive name match
+find /home -iname "*.flag"
 
-- Find files belonging to a specific group:
+# Find only files (not directories)
+find /home -type f -name "*.flag"
 
-  `find <path/to/search> -group <groupname>`
+# Find only directories
+find /home -type d
 
-- Find files of a specific size. The `+` and `-` symbols specify greater than and less than, respectively:
+# Find files owned by a specific user
+find /home -user bushranger101
 
-  `find <path/to/search> -size +<size>[cwbkMG]`
+# Find files owned by a specific group
+find /home -group bushranger101
 
-  `c` - bytes, `w` - two-byte words, `b` - 512-byte blocks, `k` - Kilobytes, `M` - Megabytes, `G` - Gigabytes
+# Find files with specific permissions (exact match)
+find /home -perm 640
 
-## Composite Examples
+# Find files modified in the last 24 hours
+find /home -mtime -1
 
-- Find .txt files owned by user 'john':
+# Find files larger than 1MB
+find /home -size +1M
 
-  `find <path/to/search> -name "*.txt" -user john`
+# Find files and run a command on each result
+find /home -name "*.flag" -exec cat {} \;
+```
 
-- Find files of a specific size (e.g., larger than 2MB) and owned by a specific group:
+---
 
-  `find <path/to/search> -size +2M -group <groupname>`
+## Composite Example
 
-- Find .jpg files smaller than 500KB and owned by 'sarah':
+The classic CTF scenario — a flag is hidden somewhere on the system and you need to find it:
 
-  `find <path/to/search> -name "*.jpg" -size -500k -user sarah`
+```bash
+# Search the whole filesystem for files named "secret.flag"
+find / -name "secret.flag" 2>/dev/null
+```
 
-## Notes
+```
+/home/bushranger101/secret.flag
+```
 
-- Use wildcards (`*`, `?`) in the `-name` option to match multiple files.
-  
-- The `-user` and `-group` options require exact matches of usernames and group names.
-  
-- When specifying size, pay attention to the prefix (`+` for more than, `-` for less than) and the unit (e.g., `c` for bytes, `M` for megabytes).
-  
-- Combining options allows for very specific searches tailored to your needs.
+The `2>/dev/null` redirects error messages (permission denied on directories you can't read) to `/dev/null` so they don't clutter your output.
 
-- To suppress error messages, such as permission denied, redirect them to `/dev/null` using `2> /dev/null`. This can make output cleaner if you're running a command that might encounter inaccessible directories or files:
+Finding every file your user can read that belongs to a specific group:
 
-  `find <path/to/search> [options] 2> /dev/null`
-  
-  This redirects standard error (stderr, file descriptor 2) to `/dev/null`, effectively ignoring any error messages produced by the command.
+```bash
+find / -group bushranger101 -readable 2>/dev/null
+```
+
+Finding files with the SUID bit set (a common CTF target — files that run as their owner regardless of who executes them):
+
+```bash
+find / -perm -4000 -type f 2>/dev/null
+```
+
+---
+
+## Notes for Students
+
+- **`2>/dev/null` is almost always needed** when running `find` as a non-root user. Hundreds of "Permission denied" errors will bury your actual results. Redirect stderr to `/dev/null` to silence them.
+- `-type f` means regular file. `-type d` means directory. `-type l` means symlink. Always specify `-type f` when looking for flags — you don't want directories cluttering your results.
+- `-exec command {} \;` runs a command on every file found. The `{}` is replaced by the filename. The `\;` ends the command. This is how you chain `find` with `cat`, `chmod`, or anything else.
+- In wargames, `find` with `-perm -4000` (SUID files), `-group targetuser` (files a group can access), and `-name` patterns are the three searches you'll use most.
+- `find . -name "*.flag"` searches from the current directory downward. `find /` searches the whole filesystem from root. The starting path matters — start narrow and go wider if you don't find results.
