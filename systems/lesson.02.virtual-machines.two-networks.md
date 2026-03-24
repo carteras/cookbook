@@ -30,7 +30,6 @@ WITH BRIDGE:
 
 - Add hardware to an existing VM in `virt-manager`
 - Understand the difference between NAT and bridged networking
-- Install and configure `dhcp-client` on Fedora
 - Write a `systemd-networkd` network configuration file
 - Connect to your VM from another computer on the local network
 
@@ -66,7 +65,7 @@ You should see something like:
 4: br0: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc noqueue state UP ...
 ```
 
-If you get `Device "br0" does not exist`, speak to your instructor — the bridge needs to be created first.
+If you get `Device "br0" does not exist`, speak to me — the bridge needs to be created first.
 
 > ⚠️ **Do NOT bridge to `eno1` (or `eth0`) directly.** Always use `br0`. Bridging directly to a physical NIC can cause network problems for the whole classroom.
 
@@ -216,24 +215,7 @@ sudo systemctl restart systemd-networkd
 
 ### Step 4.4 — Request an IP Address
 
-```bash
-sudo dhclient enp7s0
-```
-
-Wait a few seconds, then check your IP addresses:
-
-```bash
-ip a
-```
-
-You should now see an IP address on your new card:
-
-```
-3: enp7s0: <BROADCAST,MULTICAST,UP,LOWER_UP>
-    inet 10.13.37.XX/24             ← You now have an IP on the local network!
-```
-
-Note down this IP address — it's how other computers will reach your VM.
+This should just magically happen after added a second network card
 
 ---
 
@@ -253,17 +235,11 @@ After the reboot, log back in and check:
 ip a
 ```
 
-Both network cards should have IP addresses. If the `enp7s0` card doesn't have one, run:
-
-```bash
-sudo systemctl status systemd-networkd
-```
-
-And look for any error messages.
-
 ---
 
 ## Part 6: Open the Firewall on the New Interface
+
+NOTE: You may not need this
 
 Fedora's firewall needs to know to allow SSH traffic on the new interface. Tell it the new interface is in the "public" zone (which allows SSH by default):
 
@@ -279,7 +255,7 @@ sudo firewall-cmd --reload
 Ask a classmate to SSH into your VM using your new IP address, or try it from your host:
 
 ```bash
-ssh yourusername@10.13.37.XX -p 2222
+ssh yourusername@10.13.37.XX -p 22
 ```
 
 If it works, your VM now has a real presence on the local network. 🎉

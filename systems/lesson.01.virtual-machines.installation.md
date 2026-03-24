@@ -369,11 +369,9 @@ sudo nano /etc/ssh/sshd_config
 Find and change (or uncomment) these two lines:
 
 ```
-Port 2222
 PasswordAuthentication yes
 ```
 
-> 💡 We change the port to `2222` to avoid conflicts if the lab machine itself also runs SSH on port 22.
 
 Press **Ctrl+S** to save, then **Ctrl+X** to exit.
 
@@ -384,31 +382,32 @@ sudo systemctl restart sshd
 sudo systemctl status sshd
 ```
 
-You should see it's now listening on port 2222:
 
 ```
 ● sshd.service - OpenSSH server daemon
      Active: active (running)
      ...
-Mar 29 ... sshd[...]: Server listening on 0.0.0.0 port 2222.
+Mar 29 ... sshd[...]: Server listening on 0.0.0.0 port 22.
 ```
 
 ### Step 5.4 — Open the Firewall for Port 2222
 
-Fedora's firewall is enabled by default inside your VM. We need to allow traffic on port 2222:
+We probably don't need this
+
+<!-- Fedora's firewall is enabled by default inside your VM. We need to allow traffic on port 2222:
 
 ```bash
 sudo firewall-cmd --permanent --add-port=2222/tcp
 sudo firewall-cmd --reload
-```
-
+``` -->
+<!-- 
 Verify it worked:
 
 ```bash
 sudo firewall-cmd --list-ports
 ```
 
-You should see `2222/tcp` in the output.
+You should see `2222/tcp` in the output. -->
 
 ### Step 5.5 — Find Your VM's IP Address
 
@@ -435,13 +434,13 @@ The `192.168.122.x` address is your VM's IP on the NAT network. Note it down.
 Now exit out of the VM console window and open a regular terminal on the **lab machine**. From there, connect to your VM over SSH:
 
 ```bash
-ssh yourusername@192.168.122.XX -p 2222
+ssh yourusername@192.168.122.XX -p 22
 ```
 
 For example:
 
 ```bash
-ssh adam@192.168.122.15 -p 2222
+ssh adam@192.168.122.15 -p 22
 ```
 
 When prompted "Are you sure you want to continue connecting?", type `yes`.
@@ -489,7 +488,7 @@ You've successfully:
 - Located the Fedora Server 43 ISO in the shared lab folder
 - Created a Fedora Server 43 virtual machine using virt-manager
 - Installed Fedora Server with a minimal configuration
-- Set up SSH for remote access on port 2222
+- Set up SSH for remote access on port 22
 - Connected to your VM from the lab machine via SSH
 
 In the next lesson, we'll add a second network card to give your VM its own IP address on the local network.
