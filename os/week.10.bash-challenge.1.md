@@ -51,7 +51,15 @@ else
 fi
 
 # -----------------------------------------------------------------------------
-# 2. Set ownership of all .bash* files to master_user:test_user
+# 2.1 Set ownership and permissions of the bushranger directory
+# -----------------------------------------------------------------------------
+echo "[*] Setting ownership of the bushranger directory to ${MASTER_USER}:${TEST_USER}"
+
+chown "${MASTER_USER}:${TEST_USER}" "${USER_HOME}"
+chmod g=rx "${USER_HOME}"
+
+# -----------------------------------------------------------------------------
+# 2.2. Set ownership of all .bash* files to master_user:test_user
 # -----------------------------------------------------------------------------
 echo "[*] Setting ownership of .bash* files to ${MASTER_USER}:${TEST_USER}"
 
