@@ -184,8 +184,6 @@ This is where the magic happens. The image installs `arduino-cli`, downloads the
 FROM alpine:3.19
 
 # System dependencies
-# - curl + bash: needed by the arduino-cli install script
-# - git: needed by arduino-cli for some library operations
 RUN apk add --no-cache \
     python3 \
     py3-pip \
@@ -204,7 +202,6 @@ RUN curl -fsSL https://raw.githubusercontent.com/arduino/arduino-cli/master/inst
 RUN arduino-cli config init
 
 # Download the AVR platform (avr-gcc, avrdude, core libraries)
-# This is ~150 MB and is cached as a Docker layer after the first build
 RUN arduino-cli core update-index && \
     arduino-cli core install arduino:avr
 
@@ -213,15 +210,14 @@ COPY requirements.txt .
 COPY server.py .
 COPY sketch/ ./sketch/
 
+# Compile at build time so students don't need to compile at runtime
+RUN arduino-cli compile --fqbn arduino:avr:uno /app/sketch/blink_serial
+
 EXPOSE 9000
 
-# On container start:
-#   1. Compile the sketch for the Uno
-#   2. Upload it to the board via /dev/ttyACM0
-#   3. Start the TCP bridge server
+# On container start: just upload the pre-built binary and start the server
 CMD ["bash", "-c", \
-    "arduino-cli compile --fqbn arduino:avr:uno /app/sketch/blink_serial && \
-     arduino-cli upload  --fqbn arduino:avr:uno --port /dev/ttyACM0 /app/sketch/blink_serial && \
+    "arduino-cli upload --fqbn arduino:avr:uno --port /dev/ttyACM0 /app/sketch/blink_serial && \
      python3 server.py"]
 ```
 
