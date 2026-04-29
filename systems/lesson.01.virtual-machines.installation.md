@@ -10,21 +10,6 @@ We'll be using **QEMU/KVM**, which is the gold standard for virtualisation on Li
 - **QEMU** is the body — it pretends to be all the hardware a computer needs (disk, network card, screen)
 - **virt-manager** is the dashboard — a graphical app that makes it easy to manage everything
 
-## Goals
-
-By the end of this module you will have:
-
-- A working Fedora Server 43 virtual machine
-- SSH access into that machine from the lab machine's terminal
-- A foundation to build on in future lessons
-
-## At the End of This Lesson You Will Be Able To
-
-- Launch `virt-manager` on a lab machine
-- Create a new virtual machine using `virt-manager`
-- Install Fedora Server 43 from an ISO image
-- Set up your user account and configure SSH access
-- Connect to your VM remotely over SSH
 
 ## Glossary
 
@@ -52,443 +37,264 @@ By the end of this module you will have:
 
 ---
 
-## Part 1: Getting the Fedora Server 43 ISO
 
-The Fedora Server 43 ISO has been placed in a shared folder on the lab machine by your instructor. You don't need to download anything.
+## Installation 
 
-To confirm you can see it, open a terminal on the lab machine and run:
+### Downloading Fedora Server 
+
+Go to https://fedoraproject.org/server/download/ and download Fedora Server DVD (iso)
+
+You can either download it in the browser or via the terminal. To do the later, right click the download arrow and use it for your `wget` address.
 
 ```bash
-ls /shared/vms/
+cd ~/Downloads
+wget https://download.fedoraproject.org/pub/fedora/linux/releases/44/Server/x86_64/iso/Fedora-Server-dvd-x86_64-44-1.7.iso
 ```
 
-You should see a file ending in `.iso`. Note the full filename — you'll need it when browsing for the ISO in virt-manager shortly. If the folder is empty or the path doesn't exist, ask your instructor before continuing.
+### virt-manager
+
+From terminal you can run:
+
+```bash
+adam@51:~$ virt-manager
+```
+
+Or press meta (windows) and type `virt`
+
+![alt text](systems/images/image.png)
 
 ---
 
-## Part 2: Creating Your Virtual Machine
+Click this guy: 
 
-### Step 2.1 — Open virt-manager
-
-```bash
-virt-manager
-```
-
-The virt-manager window will open.
-
-```
-┌─────────────────────────────────────────────────────┐
-│  Virtual Machine Manager                        [x]  │
-├─────────────────────────────────────────────────────┤
-│  File  Edit  View  Help                              │
-├─────────────────────────────────────────────────────┤
-│                                                      │
-│  Name                      CPU usage   Host CPU      │
-│  ──────────────────────────────────────────────────  │
-│  QEMU/KVM                                            │
-│                                                      │
-│  [ Create a new virtual machine ]  ← Click this     │
-│                                                      │
-└─────────────────────────────────────────────────────┘
-```
-
-Click the **"Create a new virtual machine"** button (it looks like a computer screen with a star, in the toolbar).
-
-### Step 2.2 — Choose Installation Method
-
-```
-┌─────────────────────────────────────────────────┐
-│  New VM  (Step 1 of 5)                          │
-├─────────────────────────────────────────────────┤
-│  How would you like to install the OS?          │
-│                                                 │
-│  (●) Local install media (ISO image or CDROM)  │
-│  ( ) Network Install (HTTP, HTTPS, or FTP)      │
-│  ( ) Import existing disk image                 │
-│                                                 │
-│  [  Back  ]  [  Forward  ]  [  Cancel  ]        │
-└─────────────────────────────────────────────────┘
-```
-
-Select **"Local install media (ISO image or CDROM)"** and click **Forward**.
-
-### Step 2.3 — Select the ISO
-
-Click **Browse**, then **Browse Local**, and navigate to your Fedora Server ISO.
-
-> 📌 **IMAGE PLACEHOLDER**  
-> *Screenshot needed: virt-manager ISO browser dialog showing the file picker with a Fedora ISO selected*
-
-virt-manager should automatically detect the operating system as "Fedora". If it doesn't, uncheck "Automatically detect" and type `Fedora` in the search box.
-
-Click **Forward**.
-
-### Step 2.4 — Set RAM and CPU
-
-```
-┌─────────────────────────────────────────────────┐
-│  New VM  (Step 3 of 5)                          │
-├─────────────────────────────────────────────────┤
-│  Memory:  [ 2048 ] MiB                          │
-│  CPUs:    [   2  ]                              │
-│                                                 │
-│  [  Back  ]  [  Forward  ]  [  Cancel  ]        │
-└─────────────────────────────────────────────────┘
-```
-
-- **Memory**: Set to at least `2048` MiB (2 GB). 4096 is better if your computer has the RAM.
-- **CPUs**: `2` is fine for learning.
-
-Click **Forward**.
-
-### Step 2.5 — Create a Virtual Hard Disk
-
-```
-┌─────────────────────────────────────────────────┐
-│  New VM  (Step 4 of 5)                          │
-├─────────────────────────────────────────────────┤
-│  (●) Create a disk image for the VM             │
-│      [ 20.0 ] GiB                               │
-│                                                 │
-│  [  Back  ]  [  Forward  ]  [  Cancel  ]        │
-└─────────────────────────────────────────────────┘
-```
-
-Leave the default of **20 GiB** and click **Forward**.
-
-### Step 2.6 — Name Your VM and Choose Network
-
-```
-┌─────────────────────────────────────────────────┐
-│  New VM  (Step 5 of 5)                          │
-├─────────────────────────────────────────────────┤
-│  Name: [ your-student-number ]                  │
-│                                                 │
-│  Network selection:                             │
-│  [ Virtual network 'default': NAT          ▼ ] │
-│                                                 │
-│  [  Back  ]  [  Finish  ]  [  Cancel  ]         │
-└─────────────────────────────────────────────────┘
-```
-
-- **Name**: Use your student number or a name you'll remember. **Don't use spaces.** Keep it professional — your instructor will see it.
-- **Network**: Leave as **NAT** for now. We'll add a second network card in a later lesson.
-
-Click **Finish**. Your VM will be created and the installation will start automatically.
+![alt text](systems/images/image-1.png)
 
 ---
 
-## Part 3: Installing Fedora Server 43
+Click forward: 
 
-The Fedora Server installer will appear in a new window. Follow these steps carefully.
-
-### Step 3.1 — Boot Menu
-
-When the VM starts, you'll see a boot menu. Press **Enter** or wait for it to automatically select **"Install Fedora Server 43"**.
-
-> 📌 **IMAGE PLACEHOLDER**  
-> *Screenshot needed: Fedora 43 GRUB boot menu showing "Install Fedora Server 43" option highlighted*
-
-### Step 3.2 — Language Selection
-
-Choose your language and click **Continue**.
-
-> 📌 **IMAGE PLACEHOLDER**  
-> *Screenshot needed: Fedora Anaconda installer language selection screen*
-
-### Step 3.3 — Installation Summary Screen
-
-This is the main hub. You'll see several options that need to be configured (marked with warning icons ⚠️).
-
-```
-┌─────────────────────────────────────────────────────────────┐
-│  INSTALLATION SUMMARY                                       │
-├──────────────────────────┬──────────────────────────────────┤
-│  LOCALIZATION            │  SOFTWARE                        │
-│  ⚠ Keyboard              │  ✓ Installation Source           │
-│  ✓ Language Support      │  ⚠ Software Selection            │
-│  ✓ Time & Date           │                                  │
-├──────────────────────────┼──────────────────────────────────┤
-│  SYSTEM                  │  USER SETTINGS                   │
-│  ⚠ Installation Dest.    │  ⚠ Root Account                  │
-│  ✓ KDUMP                 │  ⚠ User Creation                 │
-│  ✓ Network & Hostname    │                                  │
-└──────────────────────────┴──────────────────────────────────┘
-```
-
-Work through each item with a ⚠️.
-
-### Step 3.4 — Software Selection
-
-Click **Software Selection**.
-
-Select **Minimal Install** from the left column. This gives us a lean server without a graphical desktop — perfect for learning the command line.
-
-> 📌 **IMAGE PLACEHOLDER**  
-> *Screenshot needed: Fedora Software Selection screen with "Minimal Install" highlighted on the left*
-
-Click **Done**.
-
-### Step 3.5 — Installation Destination
-
-Click **Installation Destination**.
-
-Your virtual hard disk should be listed. Select it by clicking on it (a checkmark will appear). Leave partitioning on **Automatic**.
-
-> 📌 **IMAGE PLACEHOLDER**  
-> *Screenshot needed: Fedora Installation Destination screen with the virtual disk selected and Automatic partitioning chosen*
-
-Click **Done**.
-
-### Step 3.6 — Network & Hostname
-
-Click **Network & Hostname**.
-
-- Make sure your network card is toggled **ON** (the slider on the right should be blue/on).
-- Set the **Hostname** to something meaningful, like `fedora-server` or your student number.
-
-Click **Done**.
-
-### Step 3.7 — Root Account
-
-Click **Root Account**.
-
-For this course, **disable the root account** by checking "Disable root account". You will have full administrator access through your own account using `sudo` inside your VM — a separate root account is not needed and is best left disabled for security.
-
-Click **Done**.
-
-### Step 3.8 — User Creation
-
-Click **User Creation**. This is your personal account.
-
-```
-Full name:  [ Your Name        ]
-Username:   [ yourusername     ]  ← lowercase, no spaces
-Password:   [ **************** ]
-Confirm:    [ **************** ]
-
-[X] Make this user administrator
-```
-
-> ⚠️ **Use a strong password.** Your classmates are on the same network. Don't embarrass yourself.
-
-Check **"Make this user administrator"** — this gives you `sudo` access.
-
-Click **Done**.
-
-### Step 3.9 — Begin Installation
-
-Once all warning icons are gone, click **Begin Installation**.
-
-The installation will take a few minutes. You'll see a progress screen as files are copied and configured.
-
-> 📌 **IMAGE PLACEHOLDER**  
-> *Screenshot needed: Fedora installation progress screen showing packages being installed*
-
-### Step 3.10 — Reboot
-
-When the installation finishes, click **Reboot System**.
-
-> 📌 **IMAGE PLACEHOLDER**  
-> *Screenshot needed: Fedora installation complete screen with "Reboot System" button*
-
-If the VM doesn't reboot cleanly, you can force it off in virt-manager by clicking the power icon and selecting **Force Off**, then start it again.
+![alt text](systems/images/image-2.png)
 
 ---
 
-## Part 4: First Login and Initial Setup
+Click Browse
 
-### Step 4.1 — Log In
+![alt text](systems/images/image-3.png)
 
-After the reboot, you'll see a plain text login prompt:
+---
 
-```
-Fedora Linux 43 (Server Edition)
-Kernel 6.x.x on an x86_64
+Click browse local: 
 
-fedora-server login: yourusername
-Password:
-```
+![alt text](systems/images/image-4.png)
 
-Type your username and press Enter, then type your password (it won't show as you type — that's normal).
+---
 
-### Step 4.2 — Check Your Shell
+Go to wherever you installed it: 
 
-After logging in, check what shell you're using:
+![alt text](systems/images/image-5.png)
 
-```bash
-echo $SHELL
-```
+Click open
 
-Fedora uses `bash` by default, so you should see `/bin/bash`. 
+---
 
-### Step 4.3 — Update the System
+Click forward
 
-Your VM is a fresh install, so let's make sure it has the latest packages before we do anything else. This runs inside your VM, where you are the administrator:
+![alt text](systems/images/image-6.png)
 
-```bash
+---
+
+Click forward
+
+![alt text](systems/images/image-7.png)
+
+---
+
+Click foward
+
+![alt text](systems/images/image-8.png)
+
+
+---
+
+Give yourself a name and then press finish
+
+![alt text](systems/images/image-9.png)
+
+---
+
+You want to install Fedora
+
+![alt text](systems/images/image-10.png)
+
+---
+
+Some stuff will happen
+
+![alt text](systems/images/image-11.png)
+
+chilax!
+
+---
+
+Make sure it says English (Australia)
+
+![alt text](systems/images/image-12.png)
+
+---
+
+Click Install Destination 
+
+![alt text](systems/images/image-13.png)
+
+Then click done. We are just keeping the default configuration 
+
+---
+
+Give yourself a username and password
+
+![alt text](systems/images/image-14.png)
+
+Click done when you are done
+
+NOTE: If you forget your password or your username, you will need to re-install your VM. 
+
+---
+
+Begin installation!
+
+![alt text](systems/images/image-15.png)
+
+---
+
+Some stuff will happen: 
+
+![alt text](systems/images/image-16.png)
+
+---
+
+Eventually it will ask you to reboot it: 
+
+![alt text](systems/images/image-17.png)
+
+Click it!
+
+---
+
+Click the little lightbulb at the top of your screen: 
+
+![alt text](systems/images/image-18.png)
+
+Then click Add Hardware at the bottom
+
+---
+
+Add a Network card and change it from NAT to Bridge and write br0 in the device name 
+
+![alt text](systems/images/image-19.png)
+
+---
+
+Click the little screen to go back to your remote desktop. 
+
+### Remote desktop 
+
+log in with your username and password 
+
+---
+
+Update fedora 
+
+```bash 
 sudo dnf update -y
 ```
 
-This downloads and installs the latest updates. The first run can take a few minutes.
+---
+
+Install nano (a text editor)
+
+```bash
+sudo dnf install nano -y
+```
 
 ---
 
-## Part 5: Installing and Configuring SSH
+Enable password authentication for ssh
 
-SSH lets you log into your VM from a terminal on the lab machine — much more convenient than typing directly into the VM window. All commands in this section run **inside your VM**.
-
-### Step 5.1 — Install OpenSSH Server
-
-Fedora Server usually has SSH pre-installed, but let's confirm and install it if needed:
-
-```bash
-sudo dnf install -y openssh-server
-```
-
-### Step 5.2 — Check SSH Status
-
-```bash
-sudo systemctl status sshd
-```
-
-You should see `Active: active (running)`. If not:
-
-```bash
-sudo systemctl enable --now sshd
-```
-
-### Step 5.3 — Configure SSH
-
-Open the SSH configuration file:
-
-```bash
+```bash 
 sudo nano /etc/ssh/sshd_config
 ```
 
-Find and change (or uncomment) these two lines:
+---
 
-```
+Find your password auth status 
+
+Press control+f and search for `#Pass` and press enter
+
+Press `delete` not backspace 
+
+it should look like this: 
+
+```bash
+# To disable tunneled clear text passwords, change to "no" here!
 PasswordAuthentication yes
+#PermitEmptyPasswords no
 ```
 
+Press control + s to save and then control + x to exit
 
-Press **Ctrl+S** to save, then **Ctrl+X** to exit.
+---
 
-Restart SSH to apply the changes:
+Restart ssh server. 
 
 ```bash
 sudo systemctl restart sshd
-sudo systemctl status sshd
-```
-
-
-```
-● sshd.service - OpenSSH server daemon
-     Active: active (running)
-     ...
-Mar 29 ... sshd[...]: Server listening on 0.0.0.0 port 22.
-```
-
-### Step 5.4 — Open the Firewall for Port 2222
-
-We probably don't need this
-
-<!-- Fedora's firewall is enabled by default inside your VM. We need to allow traffic on port 2222:
-
-```bash
-sudo firewall-cmd --permanent --add-port=2222/tcp
-sudo firewall-cmd --reload
-``` -->
-<!-- 
-Verify it worked:
-
-```bash
-sudo firewall-cmd --list-ports
-```
-
-You should see `2222/tcp` in the output. -->
-
-### Step 5.5 — Find Your VM's IP Address
-
-```bash
-ip a
-```
-
-You'll see output like this:
-
-```
-1: lo: <LOOPBACK,UP,LOWER_UP> ...
-    inet 127.0.0.1/8 ...
-
-2: enp1s0: <BROADCAST,MULTICAST,UP,LOWER_UP> ...
-    inet 192.168.122.XX/24 ...      ← This is your VM's IP address
-```
-
-The `192.168.122.x` address is your VM's IP on the NAT network. Note it down.
-
----
-
-## Part 6: Connecting via SSH from the Lab Machine
-
-Now exit out of the VM console window and open a regular terminal on the **lab machine**. From there, connect to your VM over SSH:
-
-```bash
-ssh yourusername@192.168.122.XX -p 22
-```
-
-For example:
-
-```bash
-ssh adam@192.168.122.15 -p 22
-```
-
-When prompted "Are you sure you want to continue connecting?", type `yes`.
-
-Enter your password when asked.
-
-You should now see a prompt like:
-
-```bash
-[adam@fedora-server ~]$
-```
-
-Congratulations — you're logged into your VM over SSH! 🎉
-
-Let's confirm who we are:
-
-```bash
-whoami
-# Output: adam
-```
-
-And verify your administrator access works inside the VM:
-
-```bash
-sudo whoami
-# Output: root
-```
-
-> 💡 `sudo` here is running inside your VM, where you created your account as administrator. You are not running as root on the lab machine itself.
-
-### Shutting Down Your VM Gracefully
-
-At the end of class, always shut down the VM properly — don't just close the window. Run this inside your VM:
-
-```bash
-sudo shutdown now
 ```
 
 ---
 
-## Summary
+Check your ip address 
 
-You've successfully:
+type `ip a`
 
-- Located the Fedora Server 43 ISO in the shared lab folder
-- Created a Fedora Server 43 virtual machine using virt-manager
-- Installed Fedora Server with a minimal configuration
-- Set up SSH for remote access on port 22
-- Connected to your VM from the lab machine via SSH
+```bash
+adam@localhost:~$ ip a
+1: lo: <LOOPBACK,UP,LOWER_UP> mtu 65536 qdisc noqueue state UNKNOWN group default qlen 1000
+    link/loopback 00:00:00:00:00:00 brd 00:00:00:00:00:00
+    inet 127.0.0.1/8 scope host lo
+       valid_lft forever preferred_lft forever
+    inet6 ::1/128 scope host noprefixroute 
+       valid_lft forever preferred_lft forever
+2: enp1s0: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc fq_codel state UP group default qlen 1000
+    link/ether 52:54:00:9b:17:e5 brd ff:ff:ff:ff:ff:ff
+    altname enx5254009b17e5
+    inet 192.168.122.227/24 brd 192.168.122.255 scope global dynamic noprefixroute enp1s0
+       valid_lft 3073sec preferred_lft 3073sec
+    inet6 fe80::e9b7:ff72:8727:3c89/64 scope link noprefixroute 
+       valid_lft forever preferred_lft forever
+3: enp7s0: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc fq_codel state UP group default qlen 1000
+    link/ether 52:54:00:c6:3d:2d brd ff:ff:ff:ff:ff:ff
+    altname enx525400c63d2d
+    inet 10.13.37.238/24 brd 10.13.37.255 scope global dynamic noprefixroute enp7s0
+       valid_lft 3237sec preferred_lft 3237sec
+    inet6 fe80::8ab0:6ed6:8f8:6d5/64 scope link noprefixroute 
+       valid_lft forever preferred_lft forever
+adam@localhost:~$ 
+```
 
-In the next lesson, we'll add a second network card to give your VM its own IP address on the local network.
+That second ip address `10.13.37.XXX` is the one you are after. 
+
+### Terminal 
+
+On your actual PC (not your remote desktop) open terminal or tilix and ssh to your server
+
+```bash
+adam@bar:~$ ssh adam@10.13.37.238
+adam@10.13.37.238's password: 
+Web console: https://localhost:9090/ or https://192.168.122.227:9090/
+
+Last login: Wed Apr 29 13:39:45 2026 from 10.13.37.50
+adam@localhost:~$
+```
+
+
+

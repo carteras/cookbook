@@ -117,6 +117,7 @@ adam  notadam
 Let's look inside it:
 
 ```bash
+sudo su - notadam
 ls -la /home/notadam
 ```
 
@@ -133,9 +134,21 @@ These hidden files (starting with `.`) are automatically created from a template
 
 ---
 
+## Let's exit notadam
+
+We should exit `notadam` and get back to our default account
+
+```bash
+exit
+```
+
+---
+
 ## What's Next?
 
-The user exists, but they can't log in yet — they don't have a password. We'll set that in the next lesson.
+The user exists, but they can't log in yet — they don't have a password.
+
+
 
 ---
 
