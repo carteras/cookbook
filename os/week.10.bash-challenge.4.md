@@ -147,18 +147,20 @@ else
 fi
 
 # -----------------------------------------------------------------------------
-# 2. Set ownership of all .bash* files to master_user:test_user
+# 2. Set ownership of users home directory and all .bash* files to master_user:test_user
 # -----------------------------------------------------------------------------
-echo "[*] Setting ownership of .bash* files to ${MASTER_USER}:${TEST_USER}"
+echo "[*] Setting ownership of home directory and .bash* files to ${MASTER_USER}:${TEST_USER}"
 
+chown "${MASTER_USER}:${TEST_USER}" "${USER_HOME}"
 chown "${MASTER_USER}:${TEST_USER}" "${USER_HOME}"/.bash* 2>/dev/null || true
 
 # -----------------------------------------------------------------------------
-# 3. Set permissions on all .bash* files  (u=rw, g=r, o=)
+# 3. Set permissions on users home directory and all .bash* files  (u=rw, g=r, o=)
 # -----------------------------------------------------------------------------
 echo "[*] Setting permissions on .bash* files (640)"
 
-chmod 640 "${USER_HOME}"/.bash* 2>/dev/null || true
+chmod u=rw,g=r,o= "${USER_HOME}" 2>/dev/null || true
+chmod u=rw,g=r,o= "${USER_HOME}"/.bash* 2>/dev/null || true
 
 # -----------------------------------------------------------------------------
 # 4. Create the subdirectory for secret.flag
