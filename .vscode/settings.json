@@ -1,0 +1,24 @@
+{
+    "cSpell.words": [
+        "ctfd"
+    ],
+    "files.watcherExclude": {
+        ".git/objects/**": true,
+        ".git/subtree-cache/**": true,
+        ".hg/store/**": true,
+        "*/.git/objects/**": true,
+        "*/.git/subtree-cache/**": true,
+        "*/.hg/store/**": true,
+        "**/asessment_items/*": true,
+
+    },
+    "files.exclude": {
+        "**/*.png": true,
+        "**/*.pka": true,
+        "**/*.docx": true,
+        "**/*.gz": true,
+        "**/*.pdf": true,
+        "**/*/pptx": true,
+        "**/*/drawio": true,
+    }
+}
