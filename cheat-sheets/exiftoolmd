@@ -1,0 +1,235 @@
+# exiftool — image metadata
+
+> Focused on six fields: Make, Model, Description, Author, Keywords, and GPS location.
+> For everything else, see the [official documentation](https://exiftool.org).
+
+---
+
+## Read
+
+```sh
+exiftool image.jpg                       # dump all metadata
+exiftool -Make -Model image.jpg          # read specific tags
+exiftool -Description image.jpg          # reads the description of the image (if present)
+exiftool -s image.jpg                    # short tag names (good for scripting)
+exiftool -G image.jpg                    # show which group each tag belongs to
+```
+
+### Read just the six fields
+
+```sh
+exiftool \
+  -Make \
+  -Model \
+  -Description \
+  -Artist \
+  -Keywords \
+  -GPSLatitude \
+  -GPSLongitude \
+  image.jpg
+```
+
+---
+
+## Make and Model
+
+```sh
+# read
+exiftool -Make image.jpg
+exiftool -Model image.jpg
+
+# write
+exiftool -Make="Canon" image.jpg
+exiftool -Model="EOS R5" image.jpg
+
+# write both at once
+exiftool -Make="Canon" -Model="EOS R5" image.jpg
+```
+
+> These live in the EXIF group. Cameras write them automatically — editing is
+> mostly useful for forensic work or correcting bad metadata.
+
+---
+
+## Description
+
+Description lives in multiple places depending on the format and which tool wrote it.
+The most portable approach is to write to both EXIF and XMP:
+
+```sh
+# read (checks common locations)
+exiftool -Description image.jpg
+exiftool -ImageDescription image.jpg      # EXIF variant
+exiftool -XMP:Description image.jpg       # XMP variant
+
+# write to EXIF
+exiftool -ImageDescription="Sunset over the harbour" image.jpg
+
+# write to XMP (preferred for compatibility with Lightroom, Photoshop, etc.)
+exiftool -XMP:Description="Sunset over the harbour" image.jpg
+
+# write to both at once
+exiftool \
+  -ImageDescription="Sunset over the harbour" \
+  -XMP:Description="Sunset over the harbour" \
+  image.jpg
+```
+
+---
+
+## Author
+
+The author field is also fragmented across groups. `Artist` is the EXIF tag;
+`XMP-dc:Creator` is the modern standard.
+
+```sh
+# read
+exiftool -Artist image.jpg
+exiftool -XMP-dc:Creator image.jpg
+
+# write to EXIF
+exiftool -Artist="Jane Smith" image.jpg
+
+# write to XMP
+exiftool -XMP-dc:Creator="Jane Smith" image.jpg
+
+# write to both
+exiftool -Artist="Jane Smith" -XMP-dc:Creator="Jane Smith" image.jpg
+```
+
+---
+
+## Keywords / tags
+
+Keywords are stored across three different fields depending on the tool that wrote them.
+Writing to all three gives the broadest compatibility (Lightroom, stock platforms, etc.):
+
+```sh
+# read — try all three
+exiftool -Keywords image.jpg              # IPTC
+exiftool -XMP:Subject image.jpg           # XMP (used by Lightroom, Adobe)
+exiftool -XMP:HierarchicalSubject image.jpg  # hierarchical keywords (Lightroom)
+
+# add a single keyword (IPTC)
+exiftool -Keywords="landscape" image.jpg
+
+# add multiple keywords
+exiftool -Keywords="landscape" -Keywords="travel" -Keywords="sunset" image.jpg
+
+# append without overwriting existing keywords
+exiftool -Keywords+="newkeyword" image.jpg
+
+# write to IPTC and XMP together (recommended)
+exiftool \
+  -Keywords="landscape" \
+  -Keywords="travel" \
+  -XMP:Subject="landscape" \
+  -XMP:Subject="travel" \
+  image.jpg
+
+# remove a specific keyword
+exiftool -Keywords-="unwanted" image.jpg
+
+# remove all keywords
+exiftool -Keywords= -XMP:Subject= image.jpg
+```
+
+> **Note:** IPTC `Keywords` and XMP `Subject` are separate fields that most tools
+> treat as equivalent. If only one is set, some apps won't see it.
+
+---
+
+## GPS location
+
+```sh
+# read
+exiftool -GPSLatitude -GPSLongitude image.jpg
+exiftool -GPSLatitude -GPSLongitude -GPSAltitude image.jpg
+
+# read in decimal format (instead of degrees/minutes/seconds)
+exiftool -c "%.6f" -GPSLatitude -GPSLongitude image.jpg
+
+# write — Ref tags are required to indicate N/S and E/W
+exiftool \
+  -GPSLatitude=51.5074 \
+  -GPSLatitudeRef=N \
+  -GPSLongitude=0.1278 \
+  -GPSLongitudeRef=W \
+  image.jpg
+
+# write with altitude
+exiftool \
+  -GPSLatitude=51.5074 \
+  -GPSLatitudeRef=N \
+  -GPSLongitude=0.1278 \
+  -GPSLongitudeRef=W \
+  -GPSAltitude=42 \
+  -GPSAltitudeRef=0 \
+  image.jpg
+
+# copy GPS from another file
+exiftool -tagsFromFile source.jpg -GPS:all target.jpg
+
+# strip all GPS data (privacy)
+exiftool -GPS:all= image.jpg
+exiftool -GPS*= image.jpg                # wildcard form
+```
+
+> **`GPSAltitudeRef`**: `0` = above sea level, `1` = below sea level.
+
+---
+
+## Batch processing
+
+```sh
+# process all JPEGs in the current directory
+exiftool -Artist="Jane Smith" *.jpg
+
+# process recursively
+exiftool -r -Artist="Jane Smith" /path/to/photos/
+
+# overwrite originals instead of creating _original backups
+exiftool -overwrite_original -Artist="Jane Smith" *.jpg
+```
+
+> By default exiftool saves a backup of each modified file as `filename_original`.
+> Use `-overwrite_original` to skip this — it cannot be undone.
+
+---
+
+## Remove all metadata
+
+```sh
+exiftool -all= image.jpg                 # strip everything
+exiftool -all= -overwrite_original *.jpg # strip all, no backups
+```
+
+---
+
+## Gotchas
+
+**Backups** — exiftool creates a `filename_original` backup by default. Use
+`-overwrite_original` intentionally, not as a reflex.
+
+**Multiple groups** — Description, Author, and Keywords each live in several
+metadata groups (EXIF, IPTC, XMP). A tag written to one group may not be seen
+by apps that read from another. When in doubt, write to both EXIF and XMP.
+
+**`-Keywords+` vs `-Keywords`** — the bare form replaces the entire list; the
+`+` form appends. Easy to accidentally delete existing keywords.
+
+**GPS Ref tags** — `GPSLatitudeRef` and `GPSLongitudeRef` are required for
+correct parsing. Setting the coordinate without the Ref can produce ambiguous
+or incorrect results in some apps.
+
+**Encoding** — if your values include accented characters, add
+`-charset iptc=UTF8` to avoid IPTC encoding errors.
+
+---
+
+## Further reading
+
+- [exiftool.org](https://exiftool.org) — official documentation and downloads
+- [Tag names reference](https://exiftool.org/TagNames/) — full list of every supported tag
+- [ExifTool forum](https://exiftool.org/forum/) — active community for edge cases
+- [IPTC Photo Metadata Standard](https://iptc.org/standards/photo-metadata/) — the standard behind Keywords and Description
