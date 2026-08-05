@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>read — bash cheat sheet</title>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --page:    #f8f9fa;
+    --card:    #eef0f5;
+    --border:  #d8dce8;
+    --navy:    #1a1f2e;
+    --slate:   #4a5168;
+    --muted:   #7a8099;
+    --teal:    #0d7377;
+    --teal-bg: #e6f4f4;
+    --amber:   #e8a020;
+    --amb-bg:  #fdf5e6;
+    --green:   #2d8a4e;
+    --grn-bg:  #e8f5ee;
+    --red:     #c0392b;
+    --red-bg:  #fdf0ee;
+    --mono:    'JetBrains Mono', monospace;
+    --sans:    'Inter', system-ui, sans-serif;
+  }
+
+  body {
+    font-family: var(--sans);
+    background: var(--page);
+    color: var(--navy);
+    line-height: 1.6;
+    padding: 2rem 1rem 4rem;
+  }
+
+  .page { max-width: 900px; margin: 0 auto; }
+
+  /* Header */
+  .header { margin-bottom: 2.5rem; padding-bottom: 1.5rem; border-bottom: 2px solid var(--teal); }
+  .header h1 { font-family: var(--mono); font-size: 2rem; font-weight: 500; color: var(--navy); }
+  .header h1 span { color: var(--teal); }
+  .header p { margin-top: 6px; font-size: 0.95rem; color: var(--slate); }
+
+  /* Section */
+  .section { margin-bottom: 2.5rem; }
+  .section-label {
+    font-size: 0.7rem;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--teal);
+    margin-bottom: 0.75rem;
+  }
+
+  /* Card row */
+  .row { display: flex; gap: 12px; flex-wrap: wrap; }
+  .card {
+    flex: 1;
+    min-width: 180px;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 14px 16px;
+  }
+  .card-title {
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--slate);
+    margin-bottom: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+  .card p { font-size: 0.875rem; color: var(--slate); margin-top: 8px; line-height: 1.5; }
+
+  /* Code blocks — signature teal left stripe */
+  pre {
+    font-family: var(--mono);
+    font-size: 0.8rem;
+    background: #fff;
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--teal);
+    border-radius: 0 6px 6px 0;
+    padding: 12px 14px;
+    overflow-x: auto;
+    line-height: 1.7;
+    color: var(--navy);
+  }
+  .card pre { margin-top: 8px; }
+  code { font-family: var(--mono); font-size: 0.82em; background: #fff; border: 1px solid var(--border); border-radius: 3px; padding: 1px 5px; color: var(--teal); }
+
+  /* Comments in code */
+  .cm { color: var(--muted); }
+
+  /* Flags table */
+  table { width: 100%; border-collapse: collapse; font-size: 0.875rem; }
+  th {
+    text-align: left;
+    font-size: 0.7rem;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--muted);
+    padding: 8px 12px;
+    border-bottom: 2px solid var(--border);
+  }
+  td { padding: 10px 12px; border-bottom: 1px solid var(--border); vertical-align: top; }
+  tr:last-child td { border-bottom: none; }
+  td:first-child { font-family: var(--mono); font-size: 0.8rem; color: var(--teal); white-space: nowrap; }
+  td:last-child { color: var(--slate); }
+  .table-wrap { background: #fff; border: 1px solid var(--border); border-radius: 8px; overflow: hidden; }
+
+  /* Callout boxes */
+  .callout {
+    border-radius: 6px;
+    padding: 10px 14px;
+    font-size: 0.875rem;
+    margin-bottom: 8px;
+    display: flex;
+    gap: 10px;
+    align-items: flex-start;
+  }
+  .callout-icon { flex-shrink: 0; font-size: 0.9rem; margin-top: 1px; }
+  .callout.warn  { background: var(--amb-bg); border-left: 3px solid var(--amber); color: #6b4c10; }
+  .callout.ok    { background: var(--grn-bg); border-left: 3px solid var(--green); color: #1a5c32; }
+  .callout.err   { background: var(--red-bg); border-left: 3px solid var(--red);   color: #7a1f18; }
+  .callout code  { background: rgba(0,0,0,0.07); border: none; }
+
+  /* Stage comparison */
+  .stage-before { border-top: 3px solid var(--amber); }
+  .stage-after  { border-top: 3px solid var(--green); }
+  .stage-tag {
+    display: inline-block;
+    font-size: 0.7rem;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    padding: 2px 8px;
+    border-radius: 20px;
+    margin-bottom: 10px;
+  }
+  .stage-before .stage-tag { background: var(--amb-bg); color: var(--amber); }
+  .stage-after  .stage-tag { background: var(--grn-bg); color: var(--green); }
+
+  /* Flow */
+  .flow { font-family: var(--mono); font-size: 0.8rem; background: #fff; border: 1px solid var(--border); border-left: 3px solid var(--teal); border-radius: 0 6px 6px 0; padding: 16px 20px; color: var(--slate); line-height: 2; }
+  .flow .hl { color: var(--teal); font-weight: 500; }
+
+  @media (max-width: 600px) {
+    .row { flex-direction: column; }
+    .card { min-width: unset; }
+  }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <div class="header">
+    <h1><span>read</span> — bash cheat sheet</h1>
+    <p>Read input from stdin, one line at a time</p>
+  </div>
+
+  <!-- Basic syntax -->
+  <div class="section">
+    <div class="section-label">Basic syntax</div>
+    <pre><span class="cm"># read one line into a variable</span>
+read variable_name
+
+<span class="cm"># split a line into two variables on whitespace</span>
+read first last
+
+<span class="cm"># show a prompt before reading</span>
+read -p "Enter name: " name</pre>
+  </div>
+
+  <!-- Common patterns -->
+  <div class="section">
+    <div class="section-label">Common patterns</div>
+    <div class="row">
+      <div class="card">
+        <div class="card-title">Read a single line</div>
+        <pre>read line
+echo "$line"</pre>
+      </div>
+      <div class="card">
+        <div class="card-title">Read multiple lines manually</div>
+        <pre>read line1
+read line2
+read line3
+echo "$line1"
+echo "$line2"
+echo "$line3"</pre>
+      </div>
+      <div class="card">
+        <div class="card-title">Read all lines — while loop</div>
+        <pre>while read line; do
+  echo "$line"
+done</pre>
+        <p>Works for any number of lines without changes</p>
+      </div>
+      <div class="card">
+        <div class="card-title">Read into an array</div>
+        <pre>mapfile -t lines \
+  &lt; /dev/stdin
+
+echo "${lines[0]}"
+echo "${lines[1]}"</pre>
+      </div>
+    </div>
+  </div>
+
+  <!-- How input arrives -->
+  <div class="section">
+    <div class="section-label">How input arrives</div>
+    <div class="row">
+      <div class="card">
+        <div class="card-title">From a pipe</div>
+        <pre>echo "hello" | ./test.sh
+
+<span class="cm"># inside test.sh:</span>
+read line  <span class="cm"># gets "hello"</span></pre>
+      </div>
+      <div class="card">
+        <div class="card-title">From a file</div>
+        <pre>while read line; do
+  echo "$line"
+done &lt; passwords.txt</pre>
+      </div>
+      <div class="card">
+        <div class="card-title">Pipe + args together</div>
+        <pre>echo "secret" \
+  | ./test.sh arg1
+
+<span class="cm"># inside test.sh:</span>
+read secret_val <span class="cm"># pipe</span>
+arg1="$1"       <span class="cm"># args</span></pre>
+      </div>
+      <div class="card">
+        <div class="card-title">10 lines from a pipe</div>
+        <pre>cat passwords.txt \
+  | ./test.sh
+
+<span class="cm"># each line arrives</span>
+<span class="cm"># one at a time</span></pre>
+      </div>
+    </div>
+  </div>
+
+  <!-- Useful flags -->
+  <div class="section">
+    <div class="section-label">Useful flags</div>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr><th>Flag</th><th>Description</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>-p "text"</td><td>Show a prompt before reading</td></tr>
+          <tr><td>-s</td><td>Silent mode — hides input (good for passwords)</td></tr>
+          <tr><td>-r</td><td>Raw mode — don't treat backslash as escape. Use this by default.</td></tr>
+          <tr><td>-n N</td><td>Stop after N characters — don't wait for Enter</td></tr>
+          <tr><td>-t N</td><td>Timeout after N seconds</td></tr>
+          <tr><td>-a arr</td><td>Read words into an array instead of a string</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- The two-stage lesson -->
+  <div class="section">
+    <div class="section-label">The two-stage lesson</div>
+    <div class="row">
+      <div class="card stage-before">
+        <div class="stage-tag">Stage 1 — verbose</div>
+        <pre>#!/bin/bash
+read p1
+read p2
+read p3
+read p4
+read p5
+read p6
+read p7
+read p8
+read p9
+read p10
+
+echo "$p1"
+echo "$p2"
+echo "$p3"
+echo "$p4"
+echo "$p5"
+echo "$p6"
+echo "$p7"
+echo "$p8"
+echo "$p9"
+echo "$p10"</pre>
+        <p>Breaks if input has 9 or 11 lines</p>
+      </div>
+      <div class="card stage-after">
+        <div class="stage-tag">Stage 2 — while loop</div>
+        <pre>#!/bin/bash
+while read -r line; do
+  echo "$line"
+done</pre>
+        <p>Works for any number of lines. Nothing to change. This is the refactor.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- How read works -->
+  <div class="section">
+    <div class="section-label">How read works — step by step</div>
+    <div class="flow">
+      <div>stdin opens</div>
+      <div>  │</div>
+      <div>  ▼</div>
+      <div><span class="hl">read</span> waits for a line</div>
+      <div>  │</div>
+      <div>  ├── line arrives → stored in variable → your code runs</div>
+      <div>  │</div>
+      <div>  └── no more input → <span class="hl">read</span> returns false → loop ends</div>
+    </div>
+  </div>
+
+  <!-- Gotchas -->
+  <div class="section">
+    <div class="section-label">Gotchas</div>
+    <div class="callout warn">
+      <span class="callout-icon">⚠</span>
+      <span><strong>read only gets one line</strong> — pipe 10 lines in and call <code>read</code> once, you get the first line only. The rest are dropped.</span>
+    </div>
+    <div class="callout warn">
+      <span class="callout-icon">⚠</span>
+      <span><strong>Missing quotes</strong> — <code>echo $line</code> collapses spaces and breaks on special characters. Always use <code>echo "$line"</code>.</span>
+    </div>
+    <div class="callout warn">
+      <span class="callout-icon">⚠</span>
+      <span><strong>Reusing the same variable</strong> — calling <code>read line</code> 10 times overwrites the value each time. Use different names or use a loop.</span>
+    </div>
+    <div class="callout ok">
+      <span class="callout-icon">✓</span>
+      <span><strong>Use <code>while read -r line</code></strong> as your default. The <code>-r</code> flag prevents backslashes in input from being swallowed.</span>
+    </div>
+    <div class="callout ok">
+      <span class="callout-icon">✓</span>
+      <span><strong>Use <code>done &lt; file</code></strong> instead of <code>cat file | while read</code> — the pipe version runs the loop in a subshell and variables set inside the loop won't survive after <code>done</code>.</span>
+    </div>
+  </div>
+
+</div>
+</body>
+</html>
