@@ -16,109 +16,29 @@ The loop runs once per line. When there are no more lines, it stops automaticall
 
 ---
 
-## Where the input comes from
+## Where input comes from
 
-<div style="display:flex;gap:12px;margin:1rem 0;">
-  <div style="flex:1;border:1px solid #e0e0e0;border-radius:8px;padding:14px;">
-    <strong>From a pipe</strong>
-    <pre style="margin:8px 0 0;font-size:13px;"><code>cat passwords.txt | ./test.sh
-
-# inside test.sh:
-while read line; do
-  echo "$line"
-done</code></pre>
-  </div>
-  <div style="flex:1;border:1px solid #e0e0e0;border-radius:8px;padding:14px;">
-    <strong>From a file (redirect)</strong>
-    <pre style="margin:8px 0 0;font-size:13px;"><code>while read line; do
-  echo "$line"
-done &lt; passwords.txt</code></pre>
-  </div>
-  <div style="flex:1;border:1px solid #e0e0e0;border-radius:8px;padding:14px;">
-    <strong>From a variable</strong>
-    <pre style="margin:8px 0 0;font-size:13px;"><code>data="line1
-line2
-line3"
-
-while read line; do
-  echo "$line"
-done &lt;&lt;&lt; "$data"</code></pre>
-  </div>
-</div>
+| From a pipe | From a file | From a variable |
+|-------------|-------------|-----------------|
+| `cat passwords.txt \| ./test.sh` | `while read line; do` | `data="line1` |
+| | `  echo "$line"` | `line2` |
+| Inside `test.sh`: | `done < passwords.txt` | `line3"` |
+| `while read line; do` | | |
+| `  echo "$line"` | Redirect keeps variables | `while read line; do` |
+| `done` | in scope after `done` | `  echo "$line"` |
+| | | `done <<< "$data"` |
 
 ---
 
 ## Common patterns
 
-<div style="display:flex;gap:12px;margin:1rem 0;">
-  <div style="flex:1;border:1px solid #e0e0e0;border-radius:8px;padding:14px;">
-    <strong>Print each line</strong>
-    <pre style="margin:8px 0 0;font-size:13px;"><code>while read line; do
-  echo "$line"
-done</code></pre>
-  </div>
-  <div style="flex:1;border:1px solid #e0e0e0;border-radius:8px;padding:14px;">
-    <strong>Count lines as you go</strong>
-    <pre style="margin:8px 0 0;font-size:13px;"><code>count=0
-while read line; do
-  count=$((count + 1))
-  echo "$count: $line"
-done</code></pre>
-  </div>
-  <div style="flex:1;border:1px solid #e0e0e0;border-radius:8px;padding:14px;">
-    <strong>Do something with each line</strong>
-    <pre style="margin:8px 0 0;font-size:13px;"><code>while read password; do
-  echo "Checking: $password"
-done</code></pre>
-  </div>
-  <div style="flex:1;border:1px solid #e0e0e0;border-radius:8px;padding:14px;">
-    <strong>Split each line into parts</strong>
-    <pre style="margin:8px 0 0;font-size:13px;"><code># splits on whitespace
-while read user pass; do
-  echo "User: $user"
-  echo "Pass: $pass"
-done</code></pre>
-  </div>
-</div>
-
----
-
-## How it compares to 10 × `read`
-
-<div style="display:flex;gap:12px;margin:1rem 0;">
-  <div style="flex:1;border:1px solid #e0e0e0;border-radius:8px;padding:14px;">
-    <strong>Before — 10 reads</strong>
-    <pre style="margin:8px 0 0;font-size:13px;"><code>read p1
-read p2
-read p3
-read p4
-read p5
-read p6
-read p7
-read p8
-read p9
-read p10
-
-echo "$p1"
-echo "$p2"
-echo "$p3"
-echo "$p4"
-echo "$p5"
-echo "$p6"
-echo "$p7"
-echo "$p8"
-echo "$p9"
-echo "$p10"</code></pre>
-    <p style="margin:10px 0 0;font-size:13px;color:#666;">Breaks if input has 9 or 11 lines.</p>
-  </div>
-  <div style="flex:1;border:1px solid #e0e0e0;border-radius:8px;padding:14px;">
-    <strong>After — while loop</strong>
-    <pre style="margin:8px 0 0;font-size:13px;"><code>while read line; do
-  echo "$line"
-done</code></pre>
-    <p style="margin:10px 0 0;font-size:13px;color:#666;">Works for any number of lines. Nothing to change.</p>
-  </div>
-</div>
+| Print each line | Count as you go | Do something with each | Split into parts |
+|-----------------|-----------------|------------------------|-----------------|
+| `while read line; do` | `count=0` | `while read password; do` | `# splits on whitespace` |
+| `  echo "$line"` | `while read line; do` | `  echo "Checking: $password"` | `while read user pass; do` |
+| `done` | `  count=$((count + 1))` | `done` | `  echo "User: $user"` |
+| | `  echo "$count: $line"` | | `  echo "Pass: $pass"` |
+| | `done` | | `done` |
 
 ---
 
@@ -132,33 +52,59 @@ done</code></pre>
 
 ---
 
-## Flow diagram
+## The two-stage lesson
+
+| Stage 1 — verbose | Stage 2 — while loop |
+|-------------------|----------------------|
+| `#!/bin/bash` | `#!/bin/bash` |
+| `read p1` | `while read -r line; do` |
+| `read p2` | `  echo "$line"` |
+| `read p3` | `done` |
+| `read p4` | |
+| `read p5` | Works for any number of lines. |
+| `read p6` | Nothing to change. |
+| `read p7` | This is the refactor. |
+| `read p8` | |
+| `read p9` | |
+| `read p10` | |
+| `echo "$p1"` | |
+| `echo "$p2"` ... | |
+| Breaks if input has 9 or 11 lines | |
+
+---
+
+## How it works
 
 ```
 stdin opens
     │
     ▼
-┌─────────────────────┐
-│  read gets a line   │◄─────────────┐
-└────────┬────────────┘              │
-         │                           │
-    line exists?                     │
-         │                           │
-    yes  ▼                     no    │
-┌─────────────────────┐        exit loop
-│   body runs once    │──────────────┘
-│   echo "$line"      │
-└─────────────────────┘
+while → read gets a line
+    │
+    ├── line exists → body runs → loop back to read
+    │
+    └── no more input → read returns false → exit loop
 ```
+
+---
+
+## The mental model shift
+
+| Stage 1 thinking | Stage 2 thinking |
+|------------------|------------------|
+| "I need to read line 1, then line 2, then line 3..." | "I need to do the same thing to every line until there are none left." |
+| Counting-based. One instruction per line. | Pattern-based. Think about the action, not the count. |
+| Breaks when the count is wrong. | Works regardless of how many lines arrive. |
+| 20 lines of code for 10 inputs. | 3 lines of code for any input. |
 
 ---
 
 ## Gotchas
 
-> **Missing `-r`** — without it, backslashes in input are swallowed. Use `while read -r line` as a habit.
-
-> **Variable scope** — variables set inside the loop are lost after `done` if the loop runs in a subshell (e.g. via a pipe). Use `done < file` instead of `cat file |` to keep variables in scope.
-
-> **Always quote `"$line"`** — unquoted variables collapse whitespace and break on special characters.
-
-> **`while read` stops cleanly** — no need to count lines or check for end of file manually.
+| | |
+|--|--|
+| ⚠️ | **Missing `-r`** — without it, backslashes in input are swallowed. Use `while read -r line` as a habit. |
+| ⚠️ | **Variable scope** — `cat file \| while read` runs the loop in a subshell. Variables set inside won't exist after `done`. Use `done < file` instead. |
+| ⚠️ | **Missing quotes** — `echo $line` collapses spaces and breaks on special characters. Always use `echo "$line"`. |
+| ✅ | **`while read` stops cleanly** — no need to count lines or check for end of file manually. |
+| ✅ | **Use `done < file`** not `cat file \| while read` to keep variables in scope after the loop. |
